@@ -1,0 +1,8 @@
+
+\.vscode/
+
+__pycache__/
+
+venv/
+
+dlgflw\.py

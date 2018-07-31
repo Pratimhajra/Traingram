@@ -1,0 +1,6 @@
+{
+  "name": "Traingram Flask Webhook",
+  "description": "Traingram Webhook for Dialogflow",
+  "repository": "https://github.com/Pratimhajra/Traingram",
+  "keywords": ["api.ai","Dialogflow", "natural language", "Telegram"]
+}
