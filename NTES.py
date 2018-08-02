@@ -92,10 +92,24 @@ def avg_delay(TrainNo):
         r = s.get(base_URL+f"FutureTrain?action=getTrainDataForAvgDelay&trainNo={TrainNo}", cookies=cookies)
     #TODO: Parse response and return data
 
+def stnName_to_stnCode(stnName):
+    stnName = stnName.upper()
+    with open("stnCodeswithStnNames.txt", "r", encoding='utf8') as f:
+        data_stream = f.read()
+        list_of_elems = []
+        
+        # Load every comma separated string into list
+        for elem in data_stream.strip(';').split(','):
+            list_of_elems.append(elem)
+        for elem in list_of_elems:
+            if stnName == elem:
+                stnName_index = list_of_elems.index(stnName)
+                stnCode = list_of_elems[stnName_index-1]
+                return stnCode
 
 
 if __name__ == "__main__":
-    live_status("19016", "MMCT")
+    #live_status("19016", "MMCT")
     #live_station('VR', toStn='PLG')
     #trains_btwn_stations('BCT', 'PBR')
     #train_schedule('19016')
@@ -103,3 +117,4 @@ if __name__ == "__main__":
     #diverted_trains() #starts with obj15xxx, gives unknown identifier "function"
     #rescheduled_trains() #starts with obj15xxx, gives unknown identifier "function"
     #avg_delay('19016')
+    print(stnName_to_stnCode("Porbandar"))
