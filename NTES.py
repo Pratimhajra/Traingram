@@ -28,6 +28,12 @@ def live_status(TrainNo, stnCode):
 def live_station(viaStn, toStn="null", hrs="2", trainType="ALL"):
     r = requests.get(base_URL+f"NTES?action=getTrainsViaStn&viaStn={viaStn}&toStn={toStn}&withinHrs={hrs}&trainType={trainType}")
     json_data = parse_json(r.text, ["runsOnDays", "trnName"])
+    variable = list(json_data.keys())[0]
+    trains = json_data[variable]["allTrains"]
+    print("The Trains available are:")
+    for train in trains:
+    	print(train["trainName"])
+
     #TODO: Parse response and return data
 
 def trains_btwn_stations(stn1, stn2, viaStn="null", trainType="ALL"):
