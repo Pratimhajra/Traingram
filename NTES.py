@@ -1,5 +1,7 @@
 import requests
 from pure_python_parser import parse_json
+import time
+import json
 
 base_URL = "https://enquiry.indianrail.gov.in/ntes/"
 
@@ -35,10 +37,13 @@ def trains_btwn_stations(stn1, stn2, viaStn="null", trainType="ALL"):
     if(viaStn != "null"):
         query_url = query_url+f"&viaStn={viaStn}"
     r = requests.get(query_url)
-
     json_data = parse_json(r.text, ["runsOnDays", "trnName"])
-    return json_data
-    #TODO: Parse response and return parsed data
+    variable = list(json_data.keys())[0]
+    trains=json_data[variable]["trains"]["direct"]
+    message="Trains going from  "+stn1+" to "+stn2+" are: \n"
+    for train in trains:
+        message+="\nName: "+ train["trainName"]+"\nTrain number:"+train["trainNo"]+"\nOperational: "+train["runsFromStn"]
+    return message
 
 def train_schedule(TrainNo, validOnDate=""):
     with requests.session() as s:
@@ -111,7 +116,8 @@ def stnName_to_stnCode(stnName):
 if __name__ == "__main__":
     #live_status("19016", "MMCT")
     #live_station('VR', toStn='PLG')
-    #trains_btwn_stations('BCT', 'PBR')
+    string=trains_btwn_stations('VR', 'PLG')
+    print(string)
     #train_schedule('19016')
     #show_all_cancelled_trains() #too long response
     #diverted_trains() #starts with obj15xxx, gives unknown identifier "function"
