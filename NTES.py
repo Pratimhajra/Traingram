@@ -15,6 +15,7 @@ def live_status(TrainNo, stnCode):
             'JSESSIONID': JSESSIONID,
             'SERVERID': SERVERID,
         }
+
         r = s.get(f"https://enquiry.indianrail.gov.in/ntes/NTES?action=getTrainData&trainNo={TrainNo}", cookies=cookies)
         json_data = parse_json(r.text, ["runsOnDays", "trnName"])
         # grab everything nested inside first key, i.e. _variable_<unixtimestamp>
@@ -22,16 +23,11 @@ def live_status(TrainNo, stnCode):
         stations = json_data[variable][0]["rakes"][0]["stations"]
         for station in stations:
             if(station["stnCode"] == stnCode):
-<<<<<<< HEAD
                 if(station["delayArr"] == 0):
-                    msg = "Train is on time."
+                    message = "Train is on time."
                 else:
-                    msg = "train is ",station["delayArr"]," minutes late."
-
-                return station["actArr"],station["actDep"],msg
-=======
-                return station["actArr"],station["actDep"],station["delayArr"]
->>>>>>> pranav
+                    message = "train is ",station["delayArr"]," minutes late."
+        return(message)
 
 def live_station(viaStn, toStn="null", hrs="2", trainType="ALL"):
     r = requests.get(base_URL+f"NTES?action=getTrainsViaStn&viaStn={viaStn}&toStn={toStn}&withinHrs={hrs}&trainType={trainType}")
