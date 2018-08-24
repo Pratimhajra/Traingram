@@ -29,25 +29,30 @@ def webhook():
     
     getIntent = req.get("queryResult").get("intent").get("displayName")
     if(getIntent == "LIVE_STATUS"):
-       
         getParams = req.get("queryResult").get("parameters")
-        TrainNo = getParams[0]
+        TrainNo = getParams[0][0] #trainNumber returned as a list
+        StnName = getParams[1]
         getQuery = req.get("queryResult").get("queryText")
-        status = live_status(TrainNo)
-        my_result =  {
-	      "fulfillmentText": status,
-	       "source": "Traingram-Dialogflow-Webhook",
-           "payload": {
-               "telegram":{
-                   "text": status
-               }
-           }
-       }
-        res = json.dumps(my_result, indent=4)
-        r = make_response(res)
-        r.headers['Content-Type'] = 'application/json'
-        return r
-
+        print(getQuery)
+        message = live_status(TrainNo, StnName)
+    elif(getIntent == "TRAINS_BETWEEN_STATIONS"):
+        
+    
+    
+    my_result =  {
+        "fulfillmentText": message,
+        "source": "Traingram-Dialogflow-Webhook",
+        "payload": {
+            "telegram":{
+                "text": message
+            }
+        }
+    }
+    res = json.dumps(my_result, indent=4)
+    r = make_response(res)
+    r.headers['Content-Type'] = 'application/json'
+    return r
+    
 
 if __name__ == '__main__':
 	port = int(os.getenv('PORT', 5002))
