@@ -5,7 +5,8 @@ import json
 
 base_URL = "https://enquiry.indianrail.gov.in/ntes/"
 
-def live_status(TrainNo, stnCode):
+def live_status(TrainNo, StnName):
+    stnCode = stnName_to_stnCode(StnName)
     with requests.session() as s:
         r1 = s.get(base_URL+"IamAlive")
         JSESSIONID = str(r1.cookies.get('JSESSIONID'))
@@ -32,19 +33,23 @@ def live_status(TrainNo, stnCode):
         return(message)
 
 def live_station(viaStn, toStn="null", hrs="2", trainType="ALL"):
+    viaStn = stnName_to_stnCode(viaStn)
     r = requests.get(base_URL+f"NTES?action=getTrainsViaStn&viaStn={viaStn}&toStn={toStn}&withinHrs={hrs}&trainType={trainType}")
     json_data = parse_json(r.text, ["runsOnDays", "trnName"])
     #TODO: Parse response and return data
     variable = list(json_data.keys())[0]
     trains = json_data[variable]["allTrains"]
-    message="The trains availab from "+viaStn+" to "+toStn+" is:"
+    message="The trains availab from "+viaStn+" is:"
     for train in trains:
     	message+="\n"+(station["trainName"])
     return message
 
 def trains_btwn_stations(stn1, stn2, viaStn="null", trainType="ALL"):
+    stn1 = stnName_to_stnCode(stn1)
+    stn2 = stnName_to_stnCode(stn2)
     query_url = base_URL+f"NTES?action=getTrnBwStns&stn1={stn1}&stn2={stn2}&trainType={trainType}"
     if(viaStn != "null"):
+        viaStn = stnName_to_stnCode(viaStn)
         query_url = query_url+f"&viaStn={viaStn}"
     r = requests.get(query_url)
     json_data = parse_json(r.text, ["runsOnDays", "trnName"])
