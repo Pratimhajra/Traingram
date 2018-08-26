@@ -7,10 +7,7 @@ from flask import Flask
 from flask import request	
 from flask import make_response
 
-import fileinput
-import sys
-
-import os.path
+import os
 import requests
 import json
 
@@ -22,7 +19,7 @@ from NTES import *
 
 # Flask app should start in global layout
 app = Flask(__name__)
-
+DEVELOPER_ACCESS_TOKEN = os.getenv("DEVELOPER_ACCESS_TOKEN")
 
 @app.route('/', methods=['POST'])
 def webhook():
@@ -53,6 +50,7 @@ def webhook():
     }
     res = json.dumps(my_result, indent=4)
     r = make_response(res)
+    r.headers['Authorization'] = 'Bearer ' + DEVELOPER_ACCESS_TOKEN
     r.headers['Content-Type'] = 'application/json'
     return r
     
@@ -62,4 +60,4 @@ if __name__ == '__main__':
 
 	print("Starting app on port %d" % port)
 
-	app.run(debug=True, port=port, host='0.0.0.0')
+	app.run(debug=False, port=port, host='0.0.0.0')
