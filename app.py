@@ -30,7 +30,7 @@ def webhook():
     getIntent = req.get("queryResult").get("intent").get("displayName")
     if(getIntent == "LIVE_STATUS"):
         getParams = req.get("queryResult").get("parameters")
-        TrainNo = getParams.get("trainNumber")[0] # trainNumber returned as a list
+        TrainNo = getParams.get("trainNumber")
         StnName = getParams.get("stnName")
         getQuery = req.get("queryResult").get("queryText")
         print(getQuery, "\n", TrainNo, "\n", StnName)
