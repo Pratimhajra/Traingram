@@ -5,7 +5,7 @@
 
 from flask import Flask
 from flask import request	
-from flask import make_response
+from flask import make_response, jsonify
 
 import os
 import requests
@@ -37,27 +37,24 @@ def webhook():
         #print("Message: ", message)
     #elif(getIntent == "TRAINS_BETWEEN_STATIONS"):
 
-    my_result = {
+    """my_result = {
   "fulfillmentText": "Train is on time",
   "fulfillmentMessages": [
     {
-      "card": {
-        "title": "card title",
-        "subtitle": "card text",
-        "imageUri": "https://assistant.google.com/static/images/molecule/Molecule-Formation-stop.png",
-        "buttons": [
-          {
-            "text": "button text",
-            "postback": "https://assistant.google.com/"
-          }
-        ]
+      {
+        "platform": "ACTIONS_ON_GOOGLE",
+        "text": {
+          "text": [
+            "Train is on time"
+          ]
+        }
       }
     }
   ],
   "source": "https://traingram.herokuapp.com/",
   "payload": {
     "google": {
-      "expectUserResponse": "true",
+      "expectUserResponse": true,
       "richResponse": {
         "items": [
           {
@@ -67,23 +64,10 @@ def webhook():
           }
         ]
       }
-    },
-    "facebook": {
-      "text": "Hello, Facebook!"
-    },
-    "slack": {
-      "text": "This is a text response for Slack."
-    }
-  },
-  "followupEventInput": {
-    "name": "event name",
-    "languageCode": "en-US",
-    "parameters": {
-      "param": "param value"
     }
   }
 }
-
+"""
 
     """my_result =  {
         "fulfillmentText": message,
@@ -97,8 +81,8 @@ def webhook():
         "errorType":"success"
     }
     """
-    res = json.dumps(my_result, indent=4)
-    r = make_response(res)
+    #res = json.dumps(my_result)
+    r = make_response((jsonify({'fulfillmentText': "The train is on time"})))
     r.headers['Authorization'] = 'Bearer ' + DEVELOPER_ACCESS_TOKEN
     r.headers['Content-Type'] = 'application/json'
     return r
