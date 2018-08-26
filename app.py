@@ -82,7 +82,7 @@ def webhook():
     }
     """
     #res = json.dumps(my_result)
-    r = make_response((jsonify({'fulfillmentText': "The train is on time"})))
+    r = make_response((jsonify({'fulfillmentText': 'The train is on time'})))
     r.headers['Authorization'] = 'Bearer ' + DEVELOPER_ACCESS_TOKEN
     r.headers['Content-Type'] = 'application/json'
     return r
