@@ -25,7 +25,7 @@ DEVELOPER_ACCESS_TOKEN = os.getenv("DEVELOPER_ACCESS_TOKEN")
 def webhook():
     
     req = request.get_json(silent=True, force=True)
-    #print("Request:")
+    print("Request:", req)
     
     getIntent = req.get("queryResult").get("intent").get("displayName")
     if(getIntent == "LIVE_STATUS"):
