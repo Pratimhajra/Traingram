@@ -11,7 +11,6 @@ def live_status(TrainNo, StnName):
         r1 = s.get(base_URL+"IamAlive")
         JSESSIONID = str(r1.cookies.get('JSESSIONID'))
         SERVERID = str(r1.cookies.get('SERVERID'))
-        print(JSESSIONID,SERVERID)
         s.get(base_URL+f"SearchTrain?trainNo={TrainNo}")
         
         cookies = {
@@ -129,13 +128,13 @@ def stnName_to_stnCode(stnName):
 
 
 if __name__ == "__main__":
-    #live_status("19016", "MMCT")
+    print(live_status("19016", "Palghar"))
     #live_station('VR', toStn='PLG')
-    string=trains_btwn_stations('VR', 'PLG')
-    print(string)
+    #string=trains_btwn_stations('VR', 'PLG')
+    #print(string)
     #train_schedule('19016')
     #show_all_cancelled_trains() #too long response
     #diverted_trains() #starts with obj15xxx, gives unknown identifier "function"
     #rescheduled_trains() #starts with obj15xxx, gives unknown identifier "function"
     #avg_delay('19016')
-    print(stnName_to_stnCode("Porbandar"))
+    #print(stnName_to_stnCode("Porbandar"))

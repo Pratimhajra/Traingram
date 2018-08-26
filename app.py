@@ -33,8 +33,9 @@ def webhook():
         TrainNo = int(getParams.get("trainNumber"))
         StnName = getParams.get("stnName")
         getQuery = req.get("queryResult").get("queryText")
-        print(getQuery, "\n", TrainNo, "\n", StnName)
+        print(getQuery, "\n", "TrainNo: ",TrainNo, "\n", "StnName: ",StnName)
         message = live_status(TrainNo, StnName)
+        print("Message: ", message)
     #elif(getIntent == "TRAINS_BETWEEN_STATIONS"):
 
     my_result =  {
