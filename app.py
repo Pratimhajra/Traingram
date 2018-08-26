@@ -33,7 +33,7 @@ def webhook():
         StnName = getParams.get("stnName")
         getQuery = req.get("queryResult").get("queryText")
         print(getQuery, "\n", "TrainNo: ",TrainNo, "\n", "StnName: ",StnName)
-        #message = live_status(TrainNo, StnName)
+        message = live_status(TrainNo, StnName)
         #print("Message: ", message)
     #elif(getIntent == "TRAINS_BETWEEN_STATIONS"):
 
@@ -82,7 +82,7 @@ def webhook():
     }
     """
     #res = json.dumps(my_result)
-    r = make_response((jsonify({'fulfillmentText': 'The train is on time'})))
+    r = make_response((jsonify({'fulfillmentText': message})))
     r.headers['Authorization'] = 'Bearer ' + DEVELOPER_ACCESS_TOKEN
     r.headers['Content-Type'] = 'application/json'
     return r
