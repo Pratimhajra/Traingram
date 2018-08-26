@@ -33,12 +33,12 @@ def webhook():
         StnName = getParams.get("stnName")
         getQuery = req.get("queryResult").get("queryText")
         print(getQuery, "\n", "TrainNo: ",TrainNo, "\n", "StnName: ",StnName)
-        message = live_status(TrainNo, StnName)
-        print("Message: ", message)
+        #message = live_status(TrainNo, StnName)
+        #print("Message: ", message)
     #elif(getIntent == "TRAINS_BETWEEN_STATIONS"):
 
     my_result = {
-  "fulfillmentText": message,
+  "fulfillmentText": "Train is on time",
   "fulfillmentMessages": [
     {
       "card": {
@@ -62,7 +62,7 @@ def webhook():
         "items": [
           {
             "simpleResponse": {
-              "textToSpeech": message
+              "textToSpeech": "The train is on time"
             }
           }
         ]
