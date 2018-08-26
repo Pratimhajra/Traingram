@@ -3,7 +3,6 @@ import demjson
 def parse_json(input_text, delimeters):
     input_text = input_text.strip()
     formatted_text = replace_strings(input_text, delimeters)
-    print("\n####################### FORMATTED TEXT ##################\n", formatted_text, "\n#####################################\n")
     return demjson.decode(formatted_text)
 
 
