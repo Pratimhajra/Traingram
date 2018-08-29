@@ -34,7 +34,7 @@ def webhook():
         getQuery = req.get("queryResult").get("queryText")
         print(getQuery, "\n", "TrainNo: ",TrainNo, "\n", "StnName: ",StnName)
         message = live_status(TrainNo, StnName)
-        #print("Message: ", message)
+        print("Message: ", message)
     #elif(getIntent == "TRAINS_BETWEEN_STATIONS"):
 
     r = make_response((jsonify({'fulfillmentText': message})))
