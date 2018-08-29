@@ -14,11 +14,8 @@ import os.path
 import requests
 import json
 
-#from NTES import live_status
-from NTES import *
-
 # Move NTES.py to flask-webhook/ after completing NTES functions
-
+#from NTES import live_status
 
 # Flask app should start in global layout
 app = Flask(__name__)
@@ -32,30 +29,25 @@ def webhook():
     
     getIntent = req.get("queryResult").get("intent").get("displayName")
     if(getIntent == "LIVE_STATUS"):
+       
         getParams = req.get("queryResult").get("parameters")
-        TrainNo = getParams.get("trainNumber")[0] # trainNumber returned as a list
-        StnName = getParams.get("stnName")
+        TrainNo = getParams[0]
         getQuery = req.get("queryResult").get("queryText")
-        print(getQuery, "\n", TrainNo, "\n", StnName)
-        message = live_status(TrainNo, StnName)
-    #elif(getIntent == "TRAINS_BETWEEN_STATIONS"):
+        status = live_status(TrainNo)
+        my_result =  {
+	      "fulfillmentText": status,
+	       "source": "Traingram-Dialogflow-Webhook",
+           "payload": {
+               "telegram":{
+                   "text": status
+               }
+           }
+       }
+        res = json.dumps(my_result, indent=4)
+        r = make_response(res)
+        r.headers['Content-Type'] = 'application/json'
+        return r
 
-    my_result =  {
-        "fulfillmentText": message,
-        "source": "Traingram-Dialogflow-Webhook",
-        "payload": {
-            "google":{
-                "textToSpeech": message
-            }
-        }
-        "status":200,
-        "errorType":"success"
-    }
-    res = json.dumps(my_result, indent=4)
-    r = make_response(res)
-    r.headers['Content-Type'] = 'application/json'
-    return r
-    
 
 if __name__ == '__main__':
 	port = int(os.getenv('PORT', 5002))
