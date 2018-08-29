@@ -7,7 +7,7 @@ def live_status(TrainNo, stnCode):
 	date=today.strftime("%d-%b-%y")
 	response=requests.get(f"https://api.railrider.in/api_rr_v3_test.php?page_type=live_train_status&train_num={TrainNo}&journey_station={stnCode}&journey_date={date}")
 	data=response.json()
-	var=data['delay_arr']
+	var=data.get('delayArr')
 	print(var)
 #def trains_btwn_stations(stn1, stn2, viaStn="null", trainType="ALL"):
 
