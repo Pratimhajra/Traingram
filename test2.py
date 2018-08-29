@@ -2,7 +2,8 @@ import requests
 import time
 import datetime
 import json
-def live_status(TrainNo, stnCode):
+def live_status(TrainNo, stnName):
+	stnCode = stnName_to_stnCode(stnName)
 	today=datetime.datetime.now()
 	date=today.strftime("%d-%b-%y")
 	response=requests.get(f"https://api.railrider.in/api_rr_v3_test.php?page_type=live_train_status&train_num={TrainNo}&journey_station={stnCode}&journey_date={date}")
@@ -12,7 +13,23 @@ def live_status(TrainNo, stnCode):
 	print(var)
 #def trains_btwn_stations(stn1, stn2, viaStn="null", trainType="ALL"):
 
+def stnName_to_stnCode(stnName):
+    stnName = stnName.upper()
+    with open("stnCodeswithStnNames.txt", "r", encoding='utf8') as f:
+        data_stream = f.read()
+        list_of_elems = []
+        
+        # Load every comma separated string into list
+        for elem in data_stream.strip(';').split(','):
+            list_of_elems.append(elem)
+        for elem in list_of_elems:
+            if stnName == elem:
+                stnName_index = list_of_elems.index(stnName)
+                stnCode = list_of_elems[stnName_index-1]
+                return stnCode
+
+
 if __name__ == '__main__':
-	live_status(19016,'PLG')
+	live_status(19016,'Palghar')
 
 	#https://api.railrider.in/api_rr_v3_test.php?page_type=live_train_status&train_num=19016&journey_station=PLG&journey_date=29-Aug-2018
