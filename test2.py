@@ -14,4 +14,4 @@ def live_status(TrainNo, stnCode):
 if __name__ == '__main__':
 	live_status(19016,'PLG')
 
-	https://api.railrider.in/api_rr_v3_test.php?page_type=live_train_status&train_num=19016&journey_station=PLG&journey_date=29-Aug-2018
+	#https://api.railrider.in/api_rr_v3_test.php?page_type=live_train_status&train_num=19016&journey_station=PLG&journey_date=29-Aug-2018
