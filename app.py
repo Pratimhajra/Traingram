@@ -12,8 +12,8 @@ import requests
 import json
 
 #from NTES import live_status
-from NTES import *
-
+#from NTES import *
+from test2 import *
 # Move NTES.py to flask-webhook/ after completing NTES functions
 
 
@@ -37,51 +37,6 @@ def webhook():
         #print("Message: ", message)
     #elif(getIntent == "TRAINS_BETWEEN_STATIONS"):
 
-    """my_result = {
-  "fulfillmentText": "Train is on time",
-  "fulfillmentMessages": [
-    {
-      {
-        "platform": "ACTIONS_ON_GOOGLE",
-        "text": {
-          "text": [
-            "Train is on time"
-          ]
-        }
-      }
-    }
-  ],
-  "source": "https://traingram.herokuapp.com/",
-  "payload": {
-    "google": {
-      "expectUserResponse": true,
-      "richResponse": {
-        "items": [
-          {
-            "simpleResponse": {
-              "textToSpeech": "The train is on time"
-            }
-          }
-        ]
-      }
-    }
-  }
-}
-"""
-
-    """my_result =  {
-        "fulfillmentText": message,
-        "source": "Traingram-Dialogflow-Webhook",
-        "payload": {
-            "google":{
-                "textToSpeech": message
-            }
-        },
-        "status":200,
-        "errorType":"success"
-    }
-    """
-    #res = json.dumps(my_result)
     r = make_response((jsonify({'fulfillmentText': message})))
     r.headers['Authorization'] = 'Bearer ' + DEVELOPER_ACCESS_TOKEN
     r.headers['Content-Type'] = 'application/json'
