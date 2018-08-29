@@ -1,7 +1,8 @@
 import requests
 import time
 import datetime
-import json
+
+
 def live_status(TrainNo, stnName):
     stnCode = stnName_to_stnCode(stnName)
     today=datetime.datetime.now()
@@ -10,9 +11,15 @@ def live_status(TrainNo, stnName):
     data=response.json()
     var=data.get('delay_arr')
     return var
+
+
 #def trains_btwn_stations(stn1, stn2, viaStn="null", trainType="ALL"):
+    # WIP
 
 def stnName_to_stnCode(stnName):
+    """
+    Returns Station Code for input Station Name
+    """
     stnName = stnName.upper()
     with open("stnCodeswithStnNames.txt", "r", encoding='utf8') as f:
         data_stream = f.read()
@@ -29,6 +36,4 @@ def stnName_to_stnCode(stnName):
 
 
 if __name__ == '__main__':
-    live_status(19016,'Palghar')
-
-    #https://api.railrider.in/api_rr_v3_test.php?page_type=live_train_status&train_num=19016&journey_station=PLG&journey_date=29-Aug-2018
+    live_status(19016, 'Palghar')

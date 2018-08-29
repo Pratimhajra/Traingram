@@ -1,21 +1,13 @@
 # coding: utf-8
-
-# Not ready!
-# Finish NTES.py functions before moving to this part.
+# Work in Progress
 
 from flask import Flask
 from flask import request	
 from flask import make_response, jsonify
 
 import os
-import requests
-import json
 
-#from NTES import live_status
-#from NTES import *
-from test2 import *
-# Move NTES.py to flask-webhook/ after completing NTES functions
-
+from RailRider import *
 
 # Flask app should start in global layout
 app = Flask(__name__)
@@ -32,9 +24,7 @@ def webhook():
         TrainNo = int(getParams.get("trainNumber"))
         StnName = getParams.get("stnName")
         getQuery = req.get("queryResult").get("queryText")
-        print(getQuery, "\n", "TrainNo: ",TrainNo, "\n", "StnName: ",StnName)
         message = live_status(TrainNo, StnName)
-        #print("Message: ", message)
     #elif(getIntent == "TRAINS_BETWEEN_STATIONS"):
 
     r = make_response((jsonify({'fulfillmentText': message})))
