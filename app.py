@@ -27,7 +27,15 @@ def webhook():
         message = live_status(TrainNo, StnName)
     #elif(getIntent == "TRAINS_BETWEEN_STATIONS"):
     response_dict = {'fulfillmentText': message,
-    'final_response': message}
+    "messages": [
+        {
+            "displayText": message,
+            "platform": "google",
+            "textToSpeech": message,
+            "type": "simple_response"
+        }
+    ]
+    }
 
 
     r = make_response((jsonify(response_dict)))
