@@ -27,14 +27,12 @@ def webhook():
         message = live_status(TrainNo, StnName)
     #elif(getIntent == "TRAINS_BETWEEN_STATIONS"):
     response_dict = {'fulfillmentText': message,
-    "messages": [
-        {
-            "displayText": message,
-            "platform": "google",
-            "textToSpeech": message,
-            "type": "simple_response"
-        }
-    ]
+    'fullfillment': {
+        "speech":message,
+        "displayText": message,
+        "contextOut": [],
+        "source": "Traingram"
+    }
     }
 
 
