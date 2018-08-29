@@ -1,9 +1,12 @@
 import requests
 from pure_python_parser import parse_json
+import time
+import json
 
 base_URL = "https://enquiry.indianrail.gov.in/ntes/"
 
-def live_status(TrainNo, stnCode):
+def live_status(TrainNo, StnName):
+    stnCode = stnName_to_stnCode(StnName)
     with requests.session() as s:
         r1 = s.get(base_URL+"IamAlive")
         JSESSIONID = str(r1.cookies.get('JSESSIONID'))
@@ -23,22 +26,39 @@ def live_status(TrainNo, stnCode):
         stations = json_data[variable][0]["rakes"][0]["stations"]
         for station in stations:
             if(station["stnCode"] == stnCode):
-                return station["delayArr"]
+                if(station["delayArr"] == 0):
+                    message = "Train is on time."
+                else:
+                    message = "train is ",station["delayArr"]," minutes late."
+        return(message)
 
 def live_station(viaStn, toStn="null", hrs="2", trainType="ALL"):
+    viaStn = stnName_to_stnCode(viaStn)
     r = requests.get(base_URL+f"NTES?action=getTrainsViaStn&viaStn={viaStn}&toStn={toStn}&withinHrs={hrs}&trainType={trainType}")
     json_data = parse_json(r.text, ["runsOnDays", "trnName"])
     #TODO: Parse response and return data
+    variable = list(json_data.keys())[0]
+    trains = json_data[variable]["allTrains"]
+    message="The trains availab from "+viaStn+" is:"
+    for train in trains:
+    	message+="\n"+(station["trainName"])
+    return message
 
 def trains_btwn_stations(stn1, stn2, viaStn="null", trainType="ALL"):
+    stn1 = stnName_to_stnCode(stn1)
+    stn2 = stnName_to_stnCode(stn2)
     query_url = base_URL+f"NTES?action=getTrnBwStns&stn1={stn1}&stn2={stn2}&trainType={trainType}"
     if(viaStn != "null"):
+        viaStn = stnName_to_stnCode(viaStn)
         query_url = query_url+f"&viaStn={viaStn}"
     r = requests.get(query_url)
-
     json_data = parse_json(r.text, ["runsOnDays", "trnName"])
-    return json_data
-    #TODO: Parse response and return parsed data
+    variable = list(json_data.keys())[0]
+    trains=json_data[variable]["trains"]["direct"]
+    message="Trains going from  "+stn1+" to "+stn2+" are: \n"
+    for train in trains:
+        message+="\nName: "+ train["trainName"]+"\nTrain number:"+train["trainNo"]+"\nOperational: "+train["runsFromStn"]
+    return message
 
 def train_schedule(TrainNo, validOnDate=""):
     with requests.session() as s:
@@ -111,7 +131,8 @@ def stnName_to_stnCode(stnName):
 if __name__ == "__main__":
     #live_status("19016", "MMCT")
     #live_station('VR', toStn='PLG')
-    #trains_btwn_stations('BCT', 'PBR')
+    string=trains_btwn_stations('VR', 'PLG')
+    print(string)
     #train_schedule('19016')
     #show_all_cancelled_trains() #too long response
     #diverted_trains() #starts with obj15xxx, gives unknown identifier "function"
