@@ -26,8 +26,11 @@ def webhook():
         getQuery = req.get("queryResult").get("queryText")
         message = live_status(TrainNo, StnName)
     #elif(getIntent == "TRAINS_BETWEEN_STATIONS"):
+    response_dict = {'fulfillmentText': message,
+    'final_response': message}
 
-    r = make_response((jsonify({'fulfillmentText': message})))
+
+    r = make_response((jsonify(response_dict)))
     r.headers['Authorization'] = 'Bearer ' + DEVELOPER_ACCESS_TOKEN
     r.headers['Content-Type'] = 'application/json'
     return r
