@@ -1,3 +1,4 @@
+import json
 import requests
 import time
 import datetime
@@ -13,8 +14,22 @@ def live_status(TrainNo, stnName):
     return var
 
 
-#def trains_btwn_stations(stn1, stn2, viaStn="null", trainType="ALL"):
-    # WIP
+def PNR_status(pnr):
+    payload = {'pnr_post':pnr}
+    response=requests.post("https://www.railrider.in/api/ajax_pnr_check.php", data=payload)
+    data = response.text
+    jsond = json.loads(data)
+    doj = jsond.get('doj')
+    trainname=jsond.get('train_name')
+    clas = jsond.get('class1')
+    total_passengers = jsond.get('total_passengers')
+    from_station = jsond.get('from_station').get('name')
+    to_station = jsond.get('to_station').get('name')
+    total_fare = jsond.get('total_fare')
+    message = "The PNR status is:\n"+"Date of journey: "+doj+"\nTrain_name: "+trainname+"\nclass: "+clas+"\nTotal_passengers: "+total_passengers+"\nFrom_station:"+from_station+"\n To_station: "+to_station#+"\nTotal_fare: "+total_fare
+    print(message)
+    #return(message)
+    
 
 def stnName_to_stnCode(stnName):
     """
@@ -37,3 +52,5 @@ def stnName_to_stnCode(stnName):
 
 if __name__ == '__main__':
     live_status(19016, 'Palghar')
+    PNR_status('8108432697')
+    #print(x)
