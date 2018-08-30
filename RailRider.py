@@ -34,6 +34,29 @@ def stnName_to_stnCode(stnName):
                 stnCode = list_of_elems[stnName_index-1]
                 return stnCode
 
+def trains_btwn_stations(stn1, stn2, trainType="All", viaStn="null"):
+    today=datetime.datetime.now()
+    date=today.strftime("%d-%b-%y")
+    stnc1 = stnName_to_stnCode(stn1)
+    stnc2 = stnName_to_stnCode(stn2)
+    response=requests.get(f"https://api.railrider.in/api_rr_v3_test.php?page_type=train_between_station&from={stn1}+-+{stnc1}&to={stn2}+-+{stnc2}&day=Th")
+    try:
+        data=response.json()
+    except JSONDecodeError:
+        return "Multiple Stations exist!"
+
+    num = data['total_results']
+    #train_list = []
+    message =""
+    i=0
+    while i < num:
+        var=data['result'][i]['train_name']
+        message += var + "\n"
+        #print(var)
+        i=i+1
+    return message
+
 
 if __name__ == '__main__':
     live_status(19016, 'Palghar')
+    trains_btwn_stations('VIRAR','PALGHAR')
