@@ -1,7 +1,20 @@
 import requests
 import time
 import datetime
+from datetime import date
+import calendar
 
+def day_in_short():
+    my_date = date.today()
+    day = calendar.day_name[my_date.weekday()]
+    #If the initials of day are not repeating then return first letter
+    #e.g    Tuesday and Thursday starts with so we return Tu for Tuesday and Th for Thurday
+    #   and for Monday we return M 
+    if(day =='Monday' or day == 'Wednesday' or day == 'Friday'):
+        day_code = day[0]
+    else:
+        day_code = day[0:2]
+    return day_code
 
 def live_status(TrainNo, stnName):
     stnCode = stnName_to_stnCode(stnName)
@@ -39,7 +52,8 @@ def trains_btwn_stations(stn1, stn2, trainType="All", viaStn="null"):
     date=today.strftime("%d-%b-%y")
     stnc1 = stnName_to_stnCode(stn1)
     stnc2 = stnName_to_stnCode(stn2)
-    response=requests.get(f"https://api.railrider.in/api_rr_v3_test.php?page_type=train_between_station&from={stn1}+-+{stnc1}&to={stn2}+-+{stnc2}&day=Th")
+    dayc = day_in_short()
+    response=requests.get(f"https://api.railrider.in/api_rr_v3_test.php?page_type=train_between_station&from={stn1}+-+{stnc1}&to={stn2}+-+{stnc2}&day={dayc}")
     try:
         data=response.json()
     except JSONDecodeError:
