@@ -46,7 +46,8 @@ def webhook():
         "items": [
           {
             "simpleResponse": {
-              "textToSpeech": "this is a simple response"
+              "textToSpeech": message,
+              "displayText": displayText
             }
           }
         ]
