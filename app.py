@@ -42,7 +42,6 @@ def webhook():
     my_response = {
   "payload": {
     "google": {
-      "expectUserResponse": false,
       "richResponse": {
         "items": [
           {
