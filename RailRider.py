@@ -36,8 +36,8 @@ def PNR_status(pnr):
     total_fare = str(data.get('total_fare'))
     #message = "The PNR status is:\n"+"Date of journey: "+doj+"\nTrain_name: "+trainname+"\nclass: "+clas+"\nTotal_passengers: "+total_passengers+"\nFrom_station:"+from_station+"\n To_station: "+to_station#+"\nTotal_fare: "+total_fFRare
     message = f"The PNR status is:\nDate of journey: {doj}\nTrain Name: {trainname}\nClass: {clas}\nTotal Passengers: {total_passengers}\nFrom Station: {from_station}\nTo Station: {to_station}\nTotal Fare: {total_fare}" 
-    print(message)
-    #return(message)
+    #print(message)
+    return(message)
     
 
 def stnName_to_stnCode(stnName):
@@ -58,7 +58,7 @@ def stnName_to_stnCode(stnName):
                 stnCode = list_of_elems[stnName_index-1]
                 return stnCode
 
-def trains_btwn_stations(stn1, stn2, trainType="All", viaStn="null"):
+def trains_btwn_stations(stn1, stn2):
     today=datetime.datetime.now()
     date=today.strftime("%d-%b-%y")
     stnc1 = stnName_to_stnCode(stn1)

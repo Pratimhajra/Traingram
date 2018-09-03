@@ -25,7 +25,16 @@ def webhook():
         StnName = getParams.get("stnName")
         getQuery = req.get("queryResult").get("queryText")
         message = live_status(TrainNo, StnName)
-    #elif(getIntent == "TRAINS_BETWEEN_STATIONS"):
+    elif(getIntent == "TRAINS_BETWEEN_STATIONS"):
+        getParams = req.get("queryResult").get("parameters")
+        sourceStation = getParams.get("sourceStation")
+        destinationStation = getParams.get("destinationStation")
+        getQuery = req.get("queryResult").get("queryText")
+        message = trains_btwn_stations(sourceStation, destinationStation)
+    elif(getIntent == "PNR_STATUS"):
+        getParams = req.get("queryResult").get("parameters")
+        pnr = getParams.get("pnr")
+        message = PNR_status(pnr)
 
     r = make_response((jsonify({'fulfillmentText': message})))
     r.headers['Authorization'] = 'Bearer ' + DEVELOPER_ACCESS_TOKEN
