@@ -40,9 +40,21 @@ def webhook():
         displayText = PNR_status(pnr)
     
     my_response = {
-        'fulfillmentText': message,
-        'displayText': displayText
+  "payload": {
+    "google": {
+      "expectUserResponse": false,
+      "richResponse": {
+        "items": [
+          {
+            "simpleResponse": {
+              "textToSpeech": "this is a simple response"
+            }
+          }
+        ]
+      }
     }
+  }
+}
 
     r = make_response((jsonify(my_response)))
     r.headers['Authorization'] = 'Bearer ' + DEVELOPER_ACCESS_TOKEN
