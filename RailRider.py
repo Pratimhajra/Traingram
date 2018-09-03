@@ -9,11 +9,20 @@ from json.decoder import JSONDecodeError
 def live_status(TrainNo, stnName):
     stnCode = stnName_to_stnCode(stnName)
     today=datetime.datetime.now()
-    date=today.strftime("%d-%b-%y")
-    response=requests.get(f"https://api.railrider.in/api_rr_v3_test.php?page_type=live_train_status&train_num={TrainNo}&journey_station={stnCode}&journey_date={date}")
+    date=today.strftime("%d-%m-%Y")
+    delay = 9999 # Default value of delay
+    response=requests.get(f"http://whereismytrain.in/cache/live_status?date={date}&train_no={TrainNo}")
     data=response.json()
-    var=data.get('delay_arr')
-    return var
+    for station in data.get('days_schedule'):
+        if(station.get('station_code') == stnCode):
+            delay = station.get('delay_in_arrival')
+    if delay is None or delay == 0:
+        return "The train is on time!"
+    elif delay != 9999:
+        message = f"The train is {delay} mins late"
+        return message
+    else:
+        return f"The given train doesn't run through {stnName}"
 
 
 def PNR_status(pnr):
@@ -95,5 +104,5 @@ def day_in_short():
 
 if __name__ == '__main__':
     live_status(19016, 'Palghar')
-    PNR_status('8108432697')
-    trains_btwn_stations('VIRAR','PALGHAR')
+    #PNR_status('8108432697')
+    #trains_btwn_stations('VIRAR','PALGHAR')
