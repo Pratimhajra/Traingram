@@ -2,6 +2,7 @@ import json
 import requests
 import time
 import datetime
+from datetime import date
 from time import gmtime, strftime
 from datetime import date, datetime
 import calendar
@@ -95,6 +96,7 @@ def trains_btwn_stations(stn1, stn2):
         #print(var)
         i=i+1
     return message
+
 
 def live_station(stnName, hrs=2):
     date = strftime("%d", gmtime())
