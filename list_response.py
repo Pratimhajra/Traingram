@@ -13,7 +13,6 @@ list_response ={
         }
       }
     },
-    "expectUserResponse": True,
     "expectedInputs": [
         {
             "inputPrompt": {
