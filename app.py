@@ -15,7 +15,7 @@ DEVELOPER_ACCESS_TOKEN = os.getenv("DEVELOPER_ACCESS_TOKEN")
 
 @app.route('/', methods=['POST'])
 def webhook():
-    
+    start_time = time.time()
     req = request.get_json(silent=True, force=True)
     
     getIntent = req.get("queryResult").get("intent").get("displayName")
@@ -25,9 +25,38 @@ def webhook():
         StnName = getParams.get("stnName")
         getQuery = req.get("queryResult").get("queryText")
         message = live_status(TrainNo, StnName)
-    #elif(getIntent == "TRAINS_BETWEEN_STATIONS"):
+        displayText = message
+    elif(getIntent == "TRAINS_BETWEEN_STATIONS"):
+        getParams = req.get("queryResult").get("parameters")
+        sourceStation = getParams.get("sourceStation")
+        destinationStation = getParams.get("destinationStation")
+        getQuery = req.get("queryResult").get("queryText")
+        message = f"Here are trains from {sourceStation} to {destinationStation}"
+        displayText = trains_btwn_stations(sourceStation, destinationStation)
+    elif(getIntent == "PNR_STATUS"):
+        getParams = req.get("queryResult").get("parameters")
+        pnr = getParams.get("pnr")
+        message = "Here's the PNR information: "
+        displayText = PNR_status(pnr)
+    
+    my_response = {
+  "payload": {
+    "google": {
+      "richResponse": {
+        "items": [
+          {
+            "simpleResponse": {
+              "textToSpeech": message,
+              "displayText": displayText
+            }
+          }
+        ]
+      }
+    }
+  }
+}
 
-    r = make_response((jsonify({'fulfillmentText': message})))
+    r = make_response((jsonify(my_response)))
     r.headers['Authorization'] = 'Bearer ' + DEVELOPER_ACCESS_TOKEN
     r.headers['Content-Type'] = 'application/json'
     return r
