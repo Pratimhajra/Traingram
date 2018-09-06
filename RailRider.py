@@ -2,7 +2,8 @@ import json
 import requests
 import time
 import datetime
-from datetime import date
+from time import gmtime, strftime
+from datetime import date, datetime
 import calendar
 from json.decoder import JSONDecodeError
 
@@ -59,11 +60,14 @@ def stnName_to_stnCode(stnName):
                 return stnCode
 
 def trains_btwn_stations(stn1, stn2,trainTypeA=None,trainTypeB=None,trainTypeC=None):
-    today=datetime.datetime.now()
-    date=today.strftime("%d-%b-%y")
+    date = strftime("%d", gmtime())
     stnc1 = stnName_to_stnCode(stn1)
     stnc2 = stnName_to_stnCode(stn2)
     dayc = day_in_short()
+    curr = datetime.now().strftime('%H:%M')
+    tim = curr.split(":")
+    timh = int(tim[0])
+    time_till = timh + 4
     noFilter=0
     if(trainTypeA==trainTypeB and trainTypeB==trainTypeC and trainTypeC==None):
         noFilter=1
@@ -74,23 +78,54 @@ def trains_btwn_stations(stn1, stn2,trainTypeA=None,trainTypeB=None,trainTypeC=N
         return "Multiple Stations exist!"
 
     num = data['total_results']
-    #train_list = []
-    message =""
-    i=0
-    while i < num:
-        var=data['result'][i]['train_name']
-        if(data['result'][i]['train_type']==trainTypeA or data['result'][i]['train_type']==trainTypeB or data['result'][i]['train_type']==trainTypeC or noFilter):
-            message += var + "\n"
-        #print(var)
-        i=i+1
-    return message
+    num1 = data['result'][0]['trainno']
+    train_numbers = []
+    c = 1
+    i = 0
+    while i<num:
+        if i == 0:
+            train_numbers.append(data['result'][0]['trainno'])
+            i += 1
+        if num1 != data['result'][i]['trainno']:
+            c+=1
+            train_numbers.append(data['result'][i]['trainno'])
+            i += 1
+        if num1 == data['result'][i]['trainno']:
+            break
 
+    i = 0
+    message ="Trains between "+stn1+" and "+stn2+" are :\n"
+    while i < c:
+        count = 0
+        var = data['result'][i]['train_name']
+        if(data['result'][i]['train_type']==trainTypeA or data['result'][i]['train_type']==trainTypeB or data['result'][i]['train_type']==trainTypeC or noFilter):
+            dep_stn1 = data['result'][i]['from_dep_time']
+            arr_stn2 = data['result'][i]['to_dep_time']
+            t = time.strptime(dep_stn1, "%H:%M")
+            dept = time.strftime( "%H:%M", t )
+            dat = str(dept)
+            timd = dat.split(":")
+            tim_dep = int(timd[0])
+            dep_stn1 = time.strftime( "%I:%M %p", t )
+            t = time.strptime(arr_stn2, "%H:%M")
+            arr_stn2 = time.strftime( "%I:%M %p", t )
+            number = data['result'][i]['trainno']
+            if time_till >= tim_dep and tim_dep>=timh:  
+                message += var + "\nTrain number : "+number+"\nDeparture time from "+stn1+" : "+dep_stn1+"\nArrival time at "+stn2+" : "+arr_stn2+"\n\n"        
+                count +=1
+        i+=1
+    if  count == 0:
+        message = "No trains available in next 4 hours"
+    return message
+    
 def day_in_short():
     my_date = date.today()
     day = calendar.day_name[my_date.weekday()]
-    #If the initials of day are not repeating then return first letter
-    #e.g    Tuesday and Thursday starts with so we return Tu for Tuesday and Th for Thurday
-    #   and for Monday we return M 
+    """
+    If the initials of day are not repeating then return first letter
+    e.g    Tuesday and Thursday starts with so we return Tu for Tuesday and Th for Thurday
+    and for Monday we return M 
+    """
     if(day =='Monday' or day == 'Wednesday' or day == 'Friday'):
         day_code = day[0]
     else:
@@ -100,5 +135,4 @@ def day_in_short():
 if __name__ == '__main__':
     #live_status(19016, 'Palghar')
     #PNR_status('8108432697')
-    var=trains_btwn_stations('VIRAR','PALGHAR')
-    print(var)
+    trains_btwn_stations('VIRAR','PALGHAR')
