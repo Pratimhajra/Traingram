@@ -1,7 +1,6 @@
-list_response = """
-{
+list_response ={
     "conversationToken": "",
-    "expectUserResponse": true,
+    "expectUserResponse": True,
     "expectedInputs": [
         {
             "inputPrompt": {
@@ -77,23 +76,20 @@ list_response = """
         }
     ]
 }
-"""
 
-simple_response = """
-{{
-    "payload": {{
-      "google": {{
-        "richResponse": {{
+simple_response = {
+    "payload": {
+      "google": {
+        "richResponse": {
           "items": [
-            {{
-              "simpleResponse": {{
-                "textToSpeech": {message},
-                "displayText": {displayText}
-              }}
-            }}
+            {
+              "simpleResponse": {
+                "textToSpeech": "sample",
+                "displayText": "sample"
+              }
+            }
           ]
-        }}
-      }}
-    }}
-}}
-"""
+        }
+      }
+    }
+}
