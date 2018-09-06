@@ -2,7 +2,14 @@ list_response ={
 	"payload": {
 		"google": {
 			"richResponse": {
-				"items": [{
+				"items": [
+                    {
+                    "simpleResponse": {
+                        "textToSpeech": "sample",
+                        "displayText": "sample"
+                        }
+                    },
+                    {
 						"description": "Item One Description",
 						"image": {
 							"url": "http://imageOneUrl.com",
