@@ -5,7 +5,7 @@ list_response ={
       {
         "description": "Item One Description",
         "image": {
-          "url": "http://imageOneUrl.com"
+          "url": "http://imageOneUrl.com",
           "accessibilityText": "Image description for screen readers"
         },
         "optionInfo": {
@@ -20,7 +20,7 @@ list_response ={
       {
         "description": "Item Two Description",
         "image": {
-          "url": "http://imageTwoUrl.com"
+          "url": "http://imageTwoUrl.com",
           "accessibilityText": "Image description for screen readers"
         },
         "optionInfo": {
