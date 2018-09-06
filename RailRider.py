@@ -10,7 +10,7 @@ import textwrap
 
 def live_status(TrainNo, stnName):
     stnCode = stnName_to_stnCode(stnName)
-    today=datetime.datetime.now()
+    today=datetime.now()
     date=today.strftime("%d-%m-%Y")
     delay = 9999 # Default value of delay
     response=requests.get(f"http://whereismytrain.in/cache/live_status?date={date}&train_no={TrainNo}")
@@ -44,14 +44,12 @@ def PNR_status(pnr):
     from_station = data.get('from_station').get('name')
     to_station = data.get('to_station').get('name')
     total_fare = str(data.get('total_fare'))
-    #message = "The PNR status is:\n"+"Date of journey: "+doj+"\nTrain_name: "+trainname+"\nclass: "+clas+"\nTotal_passengers: "+total_passengers+"\nFrom_station:"+from_station+"\n To_station: "+to_station#+"\nTotal_fare: "+total_fFRare
     cnf = data.get('passengers')
+    message = ""
     for i in cnf:
-    	a = data('passengers')(i)('no')
-    	print(a)
-    #print(cnf)
-    message = f"Date of journey: {doj}\nTrain Name: {trainname}\nClass: {clas}\nTotal Passengers: {total_passengers}\nFrom Station: {from_station}\nTo Station: {to_station}\nTotal Fare: {total_fare}" 
-    #print(message)
+    	Passenger_no,booking_status,current_status = i['no'],i['booking_status'],i['booking_status']
+    	message += f"NO.{Passenger_no}\nBooking_status:{booking_status}\nCurrent_status:{current_status}\n"
+    #message = f"Date of journey: {doj}\nTrain Name: {trainname}\nClass: {clas}\nTotal Passengers: {total_passengers}\nFrom Station: {from_station}\nTo Station: {to_station}\nTotal Fare: {total_fare}" 
     return(message)
     
 
@@ -74,7 +72,7 @@ def stnName_to_stnCode(stnName):
                 return stnCode
 
 def trains_btwn_stations(stn1, stn2):
-    today=datetime.datetime.now()
+    today=datetime.now()
     date=today.strftime("%d-%b-%y")
     stnc1 = stnName_to_stnCode(stn1)
     stnc2 = stnName_to_stnCode(stn2)
@@ -150,7 +148,7 @@ def day_in_short():
     return day_code
 
 if __name__ == '__main__':
-    #live_status(19016, 'Palghar')
-    #PNR_status('8108432697') #RAC 2612829606
-    #trains_btwn_stations('VIRAR','PALGHAR')
-    print(live_station('Palghar'))
+    live_status(19016, 'Palghar')
+    PNR_status('8108432697') #RAC 2612829606
+    trains_btwn_stations('VIRAR','PALGHAR')
+    live_station('Palghar')
