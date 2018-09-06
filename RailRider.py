@@ -5,6 +5,7 @@ import datetime
 from datetime import date
 import calendar
 from json.decoder import JSONDecodeError
+import textwrap
 
 def live_status(TrainNo, stnName):
     stnCode = stnName_to_stnCode(stnName)
@@ -29,13 +30,12 @@ def PNR_status(pnr):
     payload = {'pnr_post':pnr}
     response=requests.post("https://www.railrider.in/api/ajax_pnr_check.php", data=payload)
     count = 1
-    if(count<=2):
-        try:
-            data = response.json()
-        except JSONDecodeError:
-            print("JSONDecodeError... Retrying... Attempt: ", count)
-            data = response.json()
-    #data = response.json() #json.loads(data)
+    #print(len(response.text))
+    if len(response.text) == 0: # Response empty
+        message = "Your PNR number is invalid. Please verify it or try again later."
+        return message
+
+    data = response.json() #json.loads(data)
     doj = data.get('doj')
     trainname=data.get('train_name')
     clas = data.get('class1')
@@ -90,6 +90,34 @@ def trains_btwn_stations(stn1, stn2):
         i=i+1
     return message
 
+def live_station(stnName, hrs=2):
+    stnCode = stnName_to_stnCode(stnName)
+    response = requests.get(f"http://whereismytrain.in/cache/live_station?hrs={hrs}&station_code={stnCode}")
+    data = response.json()
+    message = ""
+    message_template = textwrap.dedent("""
+    Train: {name}
+    PF: {platform}
+    Delay: {delay}
+    """)
+
+    for train in data.get('live_station_info', []):
+        train_no = train.get('train_no')
+        platform = train.get('platform')
+        delay = train.get('delay_in_arrival') # "Right time" or "XX:XX"
+        if delay == "RIGHT TIME":
+            delay = "On time"
+        else:
+            hrs, mins = delay.split(':')
+            if hrs == '00':
+                delay = f"{mins} mins late"
+            else:
+                delay = f"{hrs} hours and {mins} mins late"
+        name = train.get('train_name')
+        message += message_template.format(name=name, platform=platform, delay=delay)
+
+    return message
+
 def day_in_short():
     my_date = date.today()
     day = calendar.day_name[my_date.weekday()]
@@ -104,5 +132,6 @@ def day_in_short():
 
 if __name__ == '__main__':
     live_status(19016, 'Palghar')
-    #PNR_status('8108432697')
+    #PNR_status('8108432697') #RAC 2612829606
     #trains_btwn_stations('VIRAR','PALGHAR')
+    live_station('Palghar', hrs=2)
