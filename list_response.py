@@ -1,7 +1,7 @@
 list_response ={
 	"payload": {
 		"google": {
-			"richResponse": {
+			"messages": {
 				"items": [
                     {
                     "simpleResponse": {
