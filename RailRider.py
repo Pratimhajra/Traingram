@@ -2,7 +2,8 @@ import json
 import requests
 import time
 import datetime
-from datetime import date
+from time import gmtime, strftime
+from datetime import date, datetime
 import calendar
 from json.decoder import JSONDecodeError
 import textwrap
@@ -91,12 +92,19 @@ def trains_btwn_stations(stn1, stn2):
     return message
 
 def live_station(stnName, hrs=2):
+    date = strftime("%d", gmtime())
+    curr = datetime.now().strftime("%H:%M")
+    tim = curr.split(":")
+    timh = int(tim[0])
+    time_till = timh + hrs
     stnCode = stnName_to_stnCode(stnName)
     response = requests.get(f"http://whereismytrain.in/cache/live_station?hrs={hrs}&station_code={stnCode}")
     data = response.json()
-    message = ""
+    message = "Trains at "+stnName+" within next "+str(hrs)+" hours are :\n"
     message_template = textwrap.dedent("""
     Train: {name}
+    Train Number:{number}
+    Departure Time:{Dtime}
     PF: {platform}
     Delay: {delay}
     """)
@@ -104,17 +112,23 @@ def live_station(stnName, hrs=2):
     for train in data.get('live_station_info', []):
         train_no = train.get('train_no')
         platform = train.get('platform')
-        delay = train.get('delay_in_arrival') # "Right time" or "XX:XX"
-        if delay == "RIGHT TIME":
-            delay = "On time"
-        else:
-            hrs, mins = delay.split(':')
-            if hrs == '00':
-                delay = f"{mins} mins late"
+        dep = train.get('actDep')
+        dept = dep.split(",")
+        dep_hr = dep.split(":")
+        deph = int(dep_hr[0])
+        if deph <= time_till:
+            delay = train.get('delay_in_arrival') # "Right time" or "XX:XX"
+            if delay == "RIGHT TIME":
+                delay = "On time"
             else:
-                delay = f"{hrs} hours and {mins} mins late"
-        name = train.get('train_name')
-        message += message_template.format(name=name, platform=platform, delay=delay)
+                hrs, mins = delay.split(':')
+                if hrs == '00':
+                    delay = f"{mins} mins late"
+                else:
+                    delay = f"{hrs} hours and {mins} mins late"
+            Dep_time = time.strftime( "%I:%M %p",time.strptime(dept[0], "%H:%M"))
+            name = train.get('train_name')
+            message += message_template.format(name=name, number=train_no,Dtime=Dep_time, platform=platform, delay=delay)
 
     return message
 
@@ -131,7 +145,7 @@ def day_in_short():
     return day_code
 
 if __name__ == '__main__':
-    live_status(19016, 'Palghar')
+    #live_status(19016, 'Palghar')
     #PNR_status('8108432697') #RAC 2612829606
     #trains_btwn_stations('VIRAR','PALGHAR')
-    live_station('Palghar', hrs=2)
+    print(live_station('Palghar'))
