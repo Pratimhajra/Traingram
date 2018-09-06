@@ -1,7 +1,6 @@
 import json
 import requests
 import time
-import datetime
 from time import gmtime, strftime
 from datetime import date, datetime
 import calendar
@@ -10,7 +9,7 @@ import textwrap
 
 def live_status(TrainNo, stnName):
     stnCode = stnName_to_stnCode(stnName)
-    today=datetime.datetime.now()
+    today=datetime.now()
     date=today.strftime("%d-%m-%Y")
     delay = 9999 # Default value of delay
     response=requests.get(f"http://whereismytrain.in/cache/live_status?date={date}&train_no={TrainNo}")
@@ -44,14 +43,11 @@ def PNR_status(pnr):
     from_station = data.get('from_station').get('name')
     to_station = data.get('to_station').get('name')
     total_fare = str(data.get('total_fare'))
-    #message = "The PNR status is:\n"+"Date of journey: "+doj+"\nTrain_name: "+trainname+"\nclass: "+clas+"\nTotal_passengers: "+total_passengers+"\nFrom_station:"+from_station+"\n To_station: "+to_station#+"\nTotal_fare: "+total_fFRare
     cnf = data.get('passengers')
     for i in cnf:
     	a = data('passengers')(i)('no')
     	print(a)
-    #print(cnf)
     message = f"Date of journey: {doj}\nTrain Name: {trainname}\nClass: {clas}\nTotal Passengers: {total_passengers}\nFrom Station: {from_station}\nTo Station: {to_station}\nTotal Fare: {total_fare}" 
-    #print(message)
     return(message)
     
 
@@ -73,8 +69,9 @@ def stnName_to_stnCode(stnName):
                 stnCode = list_of_elems[stnName_index-1]
                 return stnCode
 
+
 def trains_btwn_stations(stn1, stn2):
-    today=datetime.datetime.now()
+    today=datetime.now()
     date=today.strftime("%d-%b-%y")
     stnc1 = stnName_to_stnCode(stn1)
     stnc2 = stnName_to_stnCode(stn2)
@@ -96,6 +93,7 @@ def trains_btwn_stations(stn1, stn2):
         i=i+1
     return message
 
+
 def live_station(stnName, hrs=2):
     date = strftime("%d", gmtime())
     curr = datetime.now().strftime("%H:%M")
@@ -105,15 +103,14 @@ def live_station(stnName, hrs=2):
     stnCode = stnName_to_stnCode(stnName)
     response = requests.get(f"http://whereismytrain.in/cache/live_station?hrs={hrs}&station_code={stnCode}")
     data = response.json()
-    message = "Trains at "+stnName+" within next "+str(hrs)+" hours are :\n"
+    message = f"Trains at {stnName} within next {hrs} hours are :\n"
     message_template = textwrap.dedent("""
     Train: {name}
     Train Number:{number}
     Departure Time:{Dtime}
-    PF: {platform}
+    Platform Number: {platform}
     Delay: {delay}
     """)
-
     for train in data.get('live_station_info', []):
         train_no = train.get('train_no')
         platform = train.get('platform')
@@ -134,7 +131,6 @@ def live_station(stnName, hrs=2):
             Dep_time = time.strftime( "%I:%M %p",time.strptime(dept[0], "%H:%M"))
             name = train.get('train_name')
             message += message_template.format(name=name, number=train_no,Dtime=Dep_time, platform=platform, delay=delay)
-
     return message
 
 def day_in_short():
@@ -150,7 +146,7 @@ def day_in_short():
     return day_code
 
 if __name__ == '__main__':
-    #live_status(19016, 'Palghar')
-    #PNR_status('8108432697') #RAC 2612829606
+    live_status(19016, 'Palghar')
+    #PNR_status('8108432697')#RAC 2612829606
     #trains_btwn_stations('VIRAR','PALGHAR')
-    print(live_station('Palghar'))
+    #live_station('Palghar')
