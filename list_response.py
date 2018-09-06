@@ -1,4 +1,18 @@
 list_response ={
+    "payload": {
+      "google": {
+        "richResponse": {
+          "items": [
+            {
+              "simpleResponse": {
+                "textToSpeech": "sample",
+                "displayText": "sample"
+              }
+            }
+          ]
+        }
+      }
+    },
     "conversationToken": "",
     "expectUserResponse": True,
     "expectedInputs": [
