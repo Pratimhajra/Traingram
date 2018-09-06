@@ -32,6 +32,11 @@ def PNR_status(pnr):
     from_station = data.get('from_station').get('name')
     to_station = data.get('to_station').get('name')
     total_fare = str(data.get('total_fare'))
+    cnf = data.get('passengers')
+    for i in cnf:
+    	a = data('passengers')(i)('no')
+    	print(a)
+    #print(cnf)
     #message = "The PNR status is:\n"+"Date of journey: "+doj+"\nTrain_name: "+trainname+"\nclass: "+clas+"\nTotal_passengers: "+total_passengers+"\nFrom_station:"+from_station+"\n To_station: "+to_station#+"\nTotal_fare: "+total_fFRare
     message = f"The PNR status is:\nDate of journey: {doj}\nTrain Name: {trainname}\nClass: {clas}\nTotal Passengers: {total_passengers}\nFrom Station: {from_station}\nTo Station: {to_station}\nTotal Fare: {total_fare}" 
     print(message)
