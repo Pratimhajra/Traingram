@@ -30,7 +30,7 @@ def webhook():
         displayText = message
         my_response = simple_response
         simple_response['messages'][0]['textToSpeech'] = message
-        simple_response['message'][0]['displayText'] = message
+        simple_response['messages'][0]['displayText'] = message
         
         print(my_response)
     elif(getIntent == "TRAINS_BETWEEN_STATIONS"):
