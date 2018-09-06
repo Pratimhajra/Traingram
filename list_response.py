@@ -1,15 +1,14 @@
 list_response ={
 	"payload": {
 		"google": {
-			"messages": {
-				"items": [
-                    {
-                    "simpleResponse": {
-                        "textToSpeech": "sample",
-                        "displayText": "sample"
-                        }
-                    },
-                    {
+			"messages": [{
+				"items": [{
+						"simpleResponse": {
+							"textToSpeech": "sample",
+							"displayText": "sample"
+						}
+					},
+					{
 						"description": "Item One Description",
 						"image": {
 							"url": "http://imageOneUrl.com",
@@ -40,10 +39,11 @@ list_response ={
 						"title": "Item Two"
 					}
 				]
-			}
+			}]
 		}
 	}
 }
+
 
 simple_response = {
     "payload": {
