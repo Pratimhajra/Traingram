@@ -13,7 +13,6 @@ list_response ={
         }
       }
     },
-    "conversationToken": "",
     "expectUserResponse": True,
     "expectedInputs": [
         {
