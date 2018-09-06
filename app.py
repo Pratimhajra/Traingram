@@ -29,8 +29,8 @@ def webhook():
         message = live_status(TrainNo, StnName)
         displayText = message
         my_response = simple_response
-        simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = message
-        simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['displayText'] = message
+        simple_response['messages'][0]['textToSpeech'] = message
+        simple_response['message'][0]['displayText'] = message
         
         print(my_response)
     elif(getIntent == "TRAINS_BETWEEN_STATIONS"):
@@ -47,8 +47,8 @@ def webhook():
         message = "Here's the PNR information: "
         displayText = PNR_status(pnr)
         my_response = simple_response
-        simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = message
-        simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['displayText'] = displayText
+        simple_response['messages'][0]['textToSpeech'] = message
+        simple_response['messages'][0]['displayText'] = displayText
         
 
     r = make_response((jsonify(my_response)))
