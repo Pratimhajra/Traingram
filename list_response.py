@@ -16,17 +16,13 @@ list_response ={
         "data": {
           "@type": "type.googleapis.com/google.actions.v2.OptionValueSpec",
           "listSelect": {
-            "title": "Hello",
+            "title": "Trains between X & Y",
             "items": [
               {
                 "optionInfo": {
                   "key": "first title key"
                 },
                 "description": "first description",
-                "image": {
-                  "url": "https://developers.google.com/actions/images/badges/XPM_BADGING_GoogleAssistant_VER.png",
-                  "accessibilityText": "first alt"
-                },
                 "title": "first title"
               },
               {
@@ -34,11 +30,42 @@ list_response ={
                   "key": "second"
                 },
                 "description": "second description",
-                "image": {
-                  "url": "https://lh3.googleusercontent.com/Nu3a6F80WfixUqf_ec_vgXy_c0-0r4VLJRXjVFF_X_CIilEu8B9fT35qyTEj_PEsKw",
-                  "accessibilityText": "second alt"
-                },
                 "title": "second title"
+              },
+							{
+                "optionInfo": {
+                  "key": "third"
+                },
+                "description": "third description",
+                "title": "third title"
+              },
+							{
+                "optionInfo": {
+                  "key": "fourth"
+                },
+                "description": "fourth description",
+                "title": "fourth title"
+              },
+							{
+                "optionInfo": {
+                  "key": "fourth"
+                },
+                "description": "fourth description",
+                "title": "fourth title"
+              },
+							{
+                "optionInfo": {
+                  "key": "fifth"
+                },
+                "description": "fifth description",
+                "title": "fifth title"
+              },
+							{
+                "optionInfo": {
+                  "key": "sixth"
+                },
+                "description": "sixth description",
+                "title": "sixth title"
               }
             ]
           }
