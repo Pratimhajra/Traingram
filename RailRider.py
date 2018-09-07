@@ -71,27 +71,63 @@ def stnName_to_stnCode(stnName):
                 return stnCode
 
 
-def trains_btwn_stations(stn1, stn2):
-    today=datetime.now()
-    date=today.strftime("%d-%b-%y")
+def trains_btwn_stations(stn1, stn2,trainTypeA=None,trainTypeB=None,trainTypeC=None):
+    date = strftime("%d", gmtime())
     stnc1 = stnName_to_stnCode(stn1)
     stnc2 = stnName_to_stnCode(stn2)
     dayc = day_in_short()
-    response=requests.get(f"https://api.railrider.in/api_rr_v3_test.php?page_type=train_between_station&from={stn1}+-+{stnc1}&to={stn2}+-+{stnc2}&day={dayc}")
+    curr = datetime.now().strftime('%H:%M')
+    tim = curr.split(":")
+    timh = int(tim[0])
+    time_till = timh + 4
+    noFilter=0
+    if(trainTypeA==trainTypeB and trainTypeB==trainTypeC and trainTypeC==None):
+        noFilter=1
+    response=requests.get(f"https://api.railrider.in/api_rr_v3_test.php?page_type=train_between_station&from={stn1}+-+{stnc1}&to={stn2}+-+{stnc2}&day=Sa")
     try:
         data=response.json()
     except JSONDecodeError:
         return "Multiple Stations exist!"
 
     num = data['total_results']
-    #train_list = []
-    message =""
-    i=0
-    while i < num:
-        var=data['result'][i]['train_name']
-        message += var + "\n"
-        #print(var)
-        i=i+1
+    num1 = data['result'][0]['trainno']
+    train_numbers = []
+    c = 1
+    i = 0
+    while i<num:
+        if i == 0:
+            train_numbers.append(data['result'][0]['trainno'])
+            i += 1
+        if num1 != data['result'][i]['trainno']:
+            c+=1
+            train_numbers.append(data['result'][i]['trainno'])
+            i += 1
+        if num1 == data['result'][i]['trainno']:
+            break
+
+    i = 0
+    message ="Trains between "+stn1+" and "+stn2+" are :\n"
+    while i < c:
+        count = 0
+        var = data['result'][i]['train_name']
+        if(data['result'][i]['train_type']==trainTypeA or data['result'][i]['train_type']==trainTypeB or data['result'][i]['train_type']==trainTypeC or noFilter):
+            dep_stn1 = data['result'][i]['from_dep_time']
+            arr_stn2 = data['result'][i]['to_dep_time']
+            t = time.strptime(dep_stn1, "%H:%M")
+            dept = time.strftime( "%H:%M", t )
+            dat = str(dept)
+            timd = dat.split(":")
+            tim_dep = int(timd[0])
+            dep_stn1 = time.strftime( "%I:%M %p", t )
+            t = time.strptime(arr_stn2, "%H:%M")
+            arr_stn2 = time.strftime( "%I:%M %p", t )
+            number = data['result'][i]['trainno']
+            if time_till >= tim_dep and tim_dep>=timh:  
+                message += var + "\nTrain number : "+number+"\nDeparture time from "+stn1+" : "+dep_stn1+"\nArrival time at "+stn2+" : "+arr_stn2+"\n\n"        
+                count +=1
+        i+=1
+    if  count == 0:
+        message = "No trains available in next 4 hours"
     return message
 
 
@@ -147,7 +183,7 @@ def day_in_short():
     return day_code
 
 if __name__ == '__main__':
-    live_status(19016, 'Palghar')
-    PNR_status('8108432697') #RAC 2612829606
+    #live_status(19016, 'Palghar')
+    #PNR_status('8108432697') #RAC 2612829606
     trains_btwn_stations('VIRAR','PALGHAR')
-    live_station('Palghar')
+    #live_station('Palghar')
