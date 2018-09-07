@@ -138,10 +138,10 @@ def trains_btwn_stations(stn1, stn2,trainTypeA=None,trainTypeB=None,trainTypeC=N
 
 def live_station(stnName, hrs=2):
     date = strftime("%d", gmtime())
-    curr = datetime.now().strftime("%H:%M")
-    tim = curr.split(":")
-    timh = int(tim[0])
-    time_till = timh + hrs
+    CurrentTime = datetime.now().strftime('%H:%M')
+    TimeSplit = CurrentTime.split(":")
+    HourTime = int(TimeSplit[0])
+    time_till = HourTime + hrs
     stnCode = stnName_to_stnCode(stnName)
     response = requests.get(f"http://whereismytrain.in/cache/live_station?hrs={hrs}&station_code={stnCode}")
     data = response.json()
@@ -156,11 +156,11 @@ def live_station(stnName, hrs=2):
     for train in data.get('live_station_info', []):
         train_no = train.get('train_no')
         platform = train.get('platform')
-        dep = train.get('actDep')
-        dept = dep.split(",")
-        dep_hr = dep.split(":")
-        deph = int(dep_hr[0])
-        if deph <= time_till:
+        DepartDateTime = train.get('actDep')
+        DepartTime = dep.split(",")
+        DepartHourMin = dep.split(":")
+        DepartHour = int(DepartHourMin[0])
+        if DepartHour <= time_till:
             delay = train.get('delay_in_arrival') # "Right time" or "XX:XX"
             if delay == "RIGHT TIME":
                 delay = "On time"
@@ -170,9 +170,9 @@ def live_station(stnName, hrs=2):
                     delay = f"{mins} mins late"
                 else:
                     delay = f"{hrs} hours and {mins} mins late"
-            Dep_time = time.strftime( "%I:%M %p",time.strptime(dept[0], "%H:%M"))
+            DepartTimeFinal = time.strftime( "%I:%M %p",time.strptime(dept[0], "%H:%M"))
             name = train.get('train_name')
-            message += message_template.format(name=name, number=train_no,Dtime=Dep_time, platform=platform, delay=delay)
+            message += message_template.format(name=name, number=train_no,Dtime=DepartTimeFinal, platform=platform, delay=delay)
     return message
 
 def day_in_short():
