@@ -1,47 +1,51 @@
 list_response ={
-	"payload": {
-		"google": {
-			"messages": [{
-				"items": [{
-						"simpleResponse": {
-							"textToSpeech": "sample",
-							"displayText": "sample"
-						}
-					},
-					{
-						"description": "Item One Description",
-						"image": {
-							"url": "http://imageOneUrl.com",
-							"accessibilityText": "Image description for screen readers"
-						},
-						"optionInfo": {
-							"key": "itemOne",
-							"synonyms": [
-								"thing one",
-								"object one"
-							]
-						},
-						"title": "Item One"
-					},
-					{
-						"description": "Item Two Description",
-						"image": {
-							"url": "http://imageTwoUrl.com",
-							"accessibilityText": "Image description for screen readers"
-						},
-						"optionInfo": {
-							"key": "itemTwo",
-							"synonyms": [
-								"thing two",
-								"object two"
-							]
-						},
-						"title": "Item Two"
-					}
-				]
-			}]
-		}
-	}
+  "payload": {
+    "google": {
+      "expectUserResponse": True,
+      "richResponse": {
+        "items": [
+          {
+            "simpleResponse": {
+              "textToSpeech": "Choose a item"
+            }
+          }
+        ]
+      },
+      "systemIntent": {
+        "intent": "actions.intent.OPTION",
+        "data": {
+          "@type": "type.googleapis.com/google.actions.v2.OptionValueSpec",
+          "listSelect": {
+            "title": "Hello",
+            "items": [
+              {
+                "optionInfo": {
+                  "key": "first title key"
+                },
+                "description": "first description",
+                "image": {
+                  "url": "https://developers.google.com/actions/images/badges/XPM_BADGING_GoogleAssistant_VER.png",
+                  "accessibilityText": "first alt"
+                },
+                "title": "first title"
+              },
+              {
+                "optionInfo": {
+                  "key": "second"
+                },
+                "description": "second description",
+                "image": {
+                  "url": "https://lh3.googleusercontent.com/Nu3a6F80WfixUqf_ec_vgXy_c0-0r4VLJRXjVFF_X_CIilEu8B9fT35qyTEj_PEsKw",
+                  "accessibilityText": "second alt"
+                },
+                "title": "second title"
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
 }
 
 
