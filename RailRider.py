@@ -78,8 +78,8 @@ def trains_btwn_stations(stn1, stn2,trainTypeA=None,trainTypeB=None,trainTypeC=N
     dayc = day_in_short()
     curr = datetime.now().strftime('%H:%M')
     tim = curr.split(":")
-    timh = int(tim[0])
-    time_till = timh + 4
+    curr_time_hr = int(tim[0])
+    time_till = curr_time_hr + 4
     noFilter=0
     if(trainTypeA==trainTypeB and trainTypeB==trainTypeC and trainTypeC==None):
         noFilter=1
@@ -106,24 +106,28 @@ def trains_btwn_stations(stn1, stn2,trainTypeA=None,trainTypeB=None,trainTypeC=N
             break
 
     i = 0
-    message ="Trains between "+stn1+" and "+stn2+" are :\n"
+    message = []
     while i < c:
         count = 0
-        var = data['result'][i]['train_name']
+        name = data['result'][i]['train_name']
         if(data['result'][i]['train_type']==trainTypeA or data['result'][i]['train_type']==trainTypeB or data['result'][i]['train_type']==trainTypeC or noFilter):
             dep_stn1 = data['result'][i]['from_dep_time']
             arr_stn2 = data['result'][i]['to_dep_time']
-            t = time.strptime(dep_stn1, "%H:%M")
-            dept = time.strftime( "%H:%M", t )
-            dat = str(dept)
-            timd = dat.split(":")
-            tim_dep = int(timd[0])
-            dep_stn1 = time.strftime( "%I:%M %p", t )
-            t = time.strptime(arr_stn2, "%H:%M")
-            arr_stn2 = time.strftime( "%I:%M %p", t )
+            temp = time.strptime(dep_stn1, "%H:%M")
+            dep_time = time.strftime( "%H:%M", temp )
+            dep_hr = str(dep_time)
+            timeSplitList = dep_hr.split(":")
+            Hours = int(timeSplitList[0])
+            depart_time = time.strftime( "%I:%M %p", temp )
+            #t = time.strptime(arr_stn2, "%H:%M")
+            arrive_time = time.strftime( "%I:%M %p",time.strptime(arr_stn2, "%H:%M"))
             number = data['result'][i]['trainno']
-            if time_till >= tim_dep and tim_dep>=timh:  
-                message += var + "\nTrain number : "+number+"\nDeparture time from "+stn1+" : "+dep_stn1+"\nArrival time at "+stn2+" : "+arr_stn2+"\n\n"        
+            if time_till >= Hours and Hours>=curr_time_hr:  
+                item_in = {"optionInfo":{"key":f"{number}"},
+                            "description": f"Departs from {stn1} at {depart_time}\nWill arrive in {stn2} by {arrive_time}",
+                            "title": f"{name}"}
+                #message += name + "\nTrain number : "+number+"\nDeparture time from "+stn1+" : "+dep_stn1+"\nArrival time at "+stn2+" : "+arr_stn2+"\n\n"        
+                message.append(item_in)
                 count +=1
         i+=1
     if  count == 0:
@@ -185,5 +189,9 @@ def day_in_short():
 if __name__ == '__main__':
     #live_status(19016, 'Palghar')
     #PNR_status('8108432697') #RAC 2612829606
-    trains_btwn_stations('VIRAR','PALGHAR')
+    print(trains_btwn_stations('VIRAR','PALGHAR'))
     #live_station('Palghar')
+    '''
+    for i in message:
+        print(i.get('title'))
+        print(i.get('description'))'''
