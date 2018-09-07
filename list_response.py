@@ -48,13 +48,6 @@ list_response ={
               },
 							{
                 "optionInfo": {
-                  "key": "fourth"
-                },
-                "description": "fourth description",
-                "title": "fourth title"
-              },
-							{
-                "optionInfo": {
                   "key": "fifth"
                 },
                 "description": "fifth description",
