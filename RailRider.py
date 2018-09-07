@@ -75,11 +75,11 @@ def trains_btwn_stations(stn1, stn2,trainTypeA=None,trainTypeB=None,trainTypeC=N
     date = strftime("%d", gmtime())
     stnc1 = stnName_to_stnCode(stn1)
     stnc2 = stnName_to_stnCode(stn2)
-    dayc = day_in_short()
-    curr = datetime.now().strftime('%H:%M')
-    tim = curr.split(":")
-    timh = int(tim[0])
-    time_till = timh + 4
+    dayInShort = day_in_short()
+    CurrentTime = datetime.now().strftime('%H:%M')
+    TimeSplit = CurrentTime.split(":")
+    HourTime = int(TimeSplit[0])
+    time_till = HourTime + 4
     noFilter=0
     if(trainTypeA==trainTypeB and trainTypeB==trainTypeC and trainTypeC==None):
         noFilter=1
@@ -89,44 +89,49 @@ def trains_btwn_stations(stn1, stn2,trainTypeA=None,trainTypeB=None,trainTypeC=N
     except JSONDecodeError:
         return "Multiple Stations exist!"
 
-    num = data['total_results']
-    num1 = data['result'][0]['trainno']
+   # print(data)
+    TotalResults = data['total_results']
+    FirstTrain = data['result'][0]['trainno']
     train_numbers = []
-    c = 1
+    ActualTrains = 1
     i = 0
-    while i<num:
+    while i<TotalResults:
         if i == 0:
-            train_numbers.append(data['result'][0]['trainno'])
             i += 1
-        if num1 != data['result'][i]['trainno']:
-            c+=1
-            train_numbers.append(data['result'][i]['trainno'])
+        if FirstTrain != data['result'][i]['trainno']:
+            ActualTrains+=1
             i += 1
-        if num1 == data['result'][i]['trainno']:
+        if FirstTrain == data['result'][i]['trainno']:
             break
-
+    print(TotalResults)
+    print(ActualTrains)
     i = 0
-    message ="Trains between "+stn1+" and "+stn2+" are :\n"
-    while i < c:
-        count = 0
-        var = data['result'][i]['train_name']
+    message = []
+    while i < ActualTrains:
+        AreTrainsAvail = 0
+        TrainName = data['result'][i]['train_name']
         if(data['result'][i]['train_type']==trainTypeA or data['result'][i]['train_type']==trainTypeB or data['result'][i]['train_type']==trainTypeC or noFilter):
-            dep_stn1 = data['result'][i]['from_dep_time']
-            arr_stn2 = data['result'][i]['to_dep_time']
-            t = time.strptime(dep_stn1, "%H:%M")
-            dept = time.strftime( "%H:%M", t )
-            dat = str(dept)
-            timd = dat.split(":")
-            tim_dep = int(timd[0])
-            dep_stn1 = time.strftime( "%I:%M %p", t )
-            t = time.strptime(arr_stn2, "%H:%M")
-            arr_stn2 = time.strftime( "%I:%M %p", t )
-            number = data['result'][i]['trainno']
-            if time_till >= tim_dep and tim_dep>=timh:  
-                message += var + "\nTrain number : "+number+"\nDeparture time from "+stn1+" : "+dep_stn1+"\nArrival time at "+stn2+" : "+arr_stn2+"\n\n"        
-                count +=1
+            DepartTime1 = data['result'][i]['from_dep_time']
+            ArriveTime2 = data['result'][i]['to_dep_time']
+            time24 = time.strptime(DepartTime1, "%H:%M")
+            DepartureTime = time.strftime( "%H:%M", time24 )
+            DepartHour = str(DepartureTime)
+            TimeSplitList = DepartHour.split(":")
+            TimeInHours = int(TimeSplitList[0])
+            DepartTime1 = time.strftime( "%I:%M %p", time24 )
+            ArriveTime2 = time.strftime( "%I:%M %p",time.strptime(ArriveTime2, "%H:%M"))
+            TrainNumber = data['result'][i]['trainno']
+            if time_till >= TimeInHours and TimeInHours>=HourTime:  
+                AllTrainDetails = {"optionInfo": {"key": f"{TrainNumber}"},
+                                    "description": f"Departsa from {stn1} at {DepartTime1}\nWill arrive in {stn2} by {ArriveTime2}",
+                                    "title": f"{TrainName}"}
+                print(AllTrainDetails)
+
+                #message += var + "\nTrain number : "+number+"\nDeparture time from "+stn1+" : "+DepartTime1+"\nArrival time at "+stn2+" : "+ArriveTime2+"\n\n"        
+                message.append(AllTrainDetails)
+                AreTrainsAvail +=1
         i+=1
-    if  count == 0:
+    if  AreTrainsAvail == 0:
         message = "No trains available in next 4 hours"
     return message
 
