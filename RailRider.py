@@ -5,13 +5,14 @@ from time import gmtime, strftime
 from datetime import date, datetime
 import calendar
 from json.decoder import JSONDecodeError
-import textwrap
+#import textwrap
+
 
 def live_status(TrainNo, stnName):
     stnCode = stnName_to_stnCode(stnName)
     today=datetime.now()
     date=today.strftime("%d-%m-%Y")
-    delay = 9999 # Default value of delay
+    delay = 9999         # Default value of delay
     response=requests.get(f"http://whereismytrain.in/cache/live_status?date={date}&train_no={TrainNo}")
     data=response.json()
     for station in data.get('days_schedule'):
@@ -30,12 +31,10 @@ def PNR_status(pnr):
     payload = {'pnr_post':pnr}
     response=requests.post("https://www.railrider.in/api/ajax_pnr_check.php", data=payload)
     count = 1
-    #print(len(response.text))
-    if len(response.text) == 0: # Response empty
+    if len(response.text) == 0:       # Response empty
         message = "Your PNR number is invalid. Please verify it or try again later."
         return message
-
-    data = response.json() #json.loads(data)
+    data = response.json() 
     doj = data.get('doj')
     trainname=data.get('train_name')
     clas = data.get('class1')
@@ -48,7 +47,7 @@ def PNR_status(pnr):
     for i in cnf:
     	Passenger_no,booking_status,current_status = i['no'],i['booking_status'],i['booking_status']
     	message += f"NO.{Passenger_no}\nBooking_status:{booking_status}\nCurrent_status:{current_status}\n"
-    #message = f"Date of journey: {doj}\nTrain Name: {trainname}\nClass: {clas}\nTotal Passengers: {total_passengers}\nFrom Station: {from_station}\nTo Station: {to_station}\nTotal Fare: {total_fare}" 
+        #message = f"Date of journey: {doj}\nTrain Name: {trainname}\nClass: {clas}\nTotal Passengers: {total_passengers}\nFrom Station: {from_station}\nTo Station: {to_station}\nTotal Fare: {total_fare}" 
     return(message)
     
 
@@ -60,7 +59,6 @@ def stnName_to_stnCode(stnName):
     with open("stnCodeswithStnNames.txt", "r", encoding='utf8') as f:
         data_stream = f.read()
         list_of_elems = []
-        
         # Load every comma separated string into list
         for elem in data_stream.strip(';').split(','):
             list_of_elems.append(elem)
@@ -75,11 +73,11 @@ def trains_btwn_stations(stn1, stn2,trainTypeA=None,trainTypeB=None,trainTypeC=N
     date = strftime("%d", gmtime())
     stnc1 = stnName_to_stnCode(stn1)
     stnc2 = stnName_to_stnCode(stn2)
-    dayc = day_in_short()
-    curr = datetime.now().strftime('%H:%M')
-    tim = curr.split(":")
-    curr_time_hr = int(tim[0])
-    time_till = curr_time_hr + 4
+    dayInShort = day_in_short()                             #Calculating short names for week days
+    CurrentTime = datetime.now().strftime('%H:%M')          #Taking the time when user call the function
+    TimeSplit = CurrentTime.split(":")                      #spliting the time to get hour
+    HourTime = int(TimeSplit[0])                            #Converting to integer value
+    time_till = HourTime + 4                                #Calculating the maximum search limit that is 4 hours
     noFilter=0
     if(trainTypeA==trainTypeB and trainTypeB==trainTypeC and trainTypeC==None):
         noFilter=1
@@ -89,79 +87,69 @@ def trains_btwn_stations(stn1, stn2,trainTypeA=None,trainTypeB=None,trainTypeC=N
     except JSONDecodeError:
         return "Multiple Stations exist!"
 
-    num = data['total_results']
-    num1 = data['result'][0]['trainno']
+    TotalResults = data['total_results']
+    FirstTrain = data['result'][0]['trainno']
     train_numbers = []
-    c = 1
+    ActualTrains = 1
     i = 0
-    while i<num:
+    #Calculating the number of trains in a day between station 1  and  station 2
+    while i<TotalResults:
         if i == 0:
-            train_numbers.append(data['result'][0]['trainno'])
             i += 1
-        if num1 != data['result'][i]['trainno']:
-            c+=1
-            train_numbers.append(data['result'][i]['trainno'])
+        if FirstTrain != data['result'][i]['trainno']:
+            ActualTrains+=1
             i += 1
-        if num1 == data['result'][i]['trainno']:
+        if FirstTrain == data['result'][i]['trainno']:  
             break
-
     i = 0
     message = []
-    while i < c:
-        count = 0
-        name = data['result'][i]['train_name']
+    while i < ActualTrains:
+        AreTrainsAvail = 0
+        TrainName = data['result'][i]['train_name']
         if(data['result'][i]['train_type']==trainTypeA or data['result'][i]['train_type']==trainTypeB or data['result'][i]['train_type']==trainTypeC or noFilter):
-            dep_stn1 = data['result'][i]['from_dep_time']
-            arr_stn2 = data['result'][i]['to_dep_time']
-            temp = time.strptime(dep_stn1, "%H:%M")
-            dep_time = time.strftime( "%H:%M", temp )
-            dep_hr = str(dep_time)
-            timeSplitList = dep_hr.split(":")
-            Hours = int(timeSplitList[0])
-            depart_time = time.strftime( "%I:%M %p", temp )
-            #t = time.strptime(arr_stn2, "%H:%M")
-            arrive_time = time.strftime( "%I:%M %p",time.strptime(arr_stn2, "%H:%M"))
-            number = data['result'][i]['trainno']
-            if time_till >= Hours and Hours>=curr_time_hr:  
-                item_in = {"optionInfo":{"key":f"{number}"},
-                            "description": f"Departs from {stn1} at {depart_time}\nWill arrive in {stn2} by {arrive_time}",
-                            "title": f"{name}"}
-                #message += name + "\nTrain number : "+number+"\nDeparture time from "+stn1+" : "+dep_stn1+"\nArrival time at "+stn2+" : "+arr_stn2+"\n\n"        
-                message.append(item_in)
-                count +=1
+            
+            DepartTime1 = data['result'][i]['from_dep_time']            #Train's departure time from station 1
+            ArriveTime2 = data['result'][i]['to_dep_time']              #Train's arrival time at station 2
+            time24 = time.strptime(DepartTime1, "%H:%M")                #Time in 24 hour fashion
+            DepartureTime = time.strftime( "%H:%M", time24 )
+            DepartHour = str(DepartureTime)                             #Converting tuple to string
+            TimeSplitList = DepartHour.split(":")   
+            TimeInHours = int(TimeSplitList[0])                         #Converting string into integer
+            DepartTime1 = time.strftime( "%I:%M %p", time24 )           #Conversion from 24 hr. fashion to 12 hr. fashion for Departure time from station 1
+            ArriveTime2 = time.strftime( "%I:%M %p",time.strptime(ArriveTime2, "%H:%M")) #Conversion from 24 hr. fashion to 12 hr. fashion for Arrival time at station 2
+            TrainNumber = data['result'][i]['trainno']
+            if time_till >= TimeInHours and TimeInHours>=HourTime:  
+                AllTrainDetails = {"optionInfo": {"key": f"{TrainNumber}"},
+                                    "description": f"Departsa from {stn1} at {DepartTime1}\nWill arrive in {stn2} by {ArriveTime2}",
+                                    "title": f"{TrainName}"}
+                message.append(AllTrainDetails)                         #Concatinating the dictionaries
+                AreTrainsAvail +=1                                 
         i+=1
-    if  count == 0:
+    if  AreTrainsAvail == 0:                                            #Checking for NULL directionary
         message = "No trains available in next 4 hours"
     return message
 
 
 def live_station(stnName, hrs=2):
     date = strftime("%d", gmtime())
-    curr = datetime.now().strftime("%H:%M")
-    tim = curr.split(":")
-    timh = int(tim[0])
-    time_till = timh + hrs
-    stnCode = stnName_to_stnCode(stnName)
+    CurrentTime = datetime.now().strftime('%H:%M')      #Taking the time when user call the function
+    TimeSplit = CurrentTime.split(":")                  #spliting the time to get hour
+    HourTime = int(TimeSplit[0])                        #Converting to integer value
+    time_till = HourTime + hrs                          #Calculating the maximum search limit that is 4 hours
+    stnCode = stnName_to_stnCode(stnName)               
     response = requests.get(f"http://whereismytrain.in/cache/live_station?hrs={hrs}&station_code={stnCode}")
     data = response.json()
-    message = f"Trains at {stnName} within next {hrs} hours are :\n"
-    message_template = textwrap.dedent("""
-    Train: {name}
-    Train Number:{number}
-    Departure Time:{Dtime}
-    Platform Number: {platform}
-    Delay: {delay}
-    """)
+    message = []
     for train in data.get('live_station_info', []):
         train_no = train.get('train_no')
         platform = train.get('platform')
-        dep = train.get('actDep')
-        dept = dep.split(",")
-        dep_hr = dep.split(":")
-        deph = int(dep_hr[0])
-        if deph <= time_till:
-            delay = train.get('delay_in_arrival') # "Right time" or "XX:XX"
-            if delay == "RIGHT TIME":
+        DepartDateTime = train.get('actDep')
+        DepartTime = DepartDateTime.split(",")
+        DepartHourMin = DepartDateTime.split(":")
+        DepartHour = int(DepartHourMin[0])
+        if DepartHour <= time_till and DepartHour >= HourTime:      #Generating the list of trains within user specified time
+            delay = train.get('delay_in_arrival')                   # "Right time" or "XX:XX"
+            if delay == "RIGHT TIME":                   
                 delay = "On time"
             else:
                 hrs, mins = delay.split(':')
@@ -169,29 +157,32 @@ def live_station(stnName, hrs=2):
                     delay = f"{mins} mins late"
                 else:
                     delay = f"{hrs} hours and {mins} mins late"
-            Dep_time = time.strftime( "%I:%M %p",time.strptime(dept[0], "%H:%M"))
+            DepartTimeFinal = time.strftime( "%I:%M %p",time.strptime(DepartTime[0], "%H:%M"))
             name = train.get('train_name')
-            message += message_template.format(name=name, number=train_no,Dtime=Dep_time, platform=platform, delay=delay)
+            All_train_details = {"optionInfo": {"key": f"{train_no}"},
+                                "description": f"Will arrive on platform : {platform} at {DepartTimeFinal}\n Delay : {delay}",
+                                "title": f"{name}"}
+            message.append(All_train_details)
     return message
+
 
 def day_in_short():
     my_date = date.today()
     day = calendar.day_name[my_date.weekday()]
-    #If the initials of day are not repeating then return first letter
-    #e.g    Tuesday and Thursday starts with so we return Tu for Tuesday and Th for Thurday
-    #   and for Monday we return M 
+    '''
+    If the initials of day are not repeating then return first letter
+    e.g    Tuesday and Thursday starts with so we return Tu for Tuesday and Th for Thurday
+           and for Monday we return M 
+    '''
     if(day =='Monday' or day == 'Wednesday' or day == 'Friday'):
         day_code = day[0]
     else:
         day_code = day[0:2]
     return day_code
 
+
 if __name__ == '__main__':
-    #live_status(19016, 'Palghar')
-    #PNR_status('8108432697') #RAC 2612829606
-    print(trains_btwn_stations('VIRAR','PALGHAR'))
-    #live_station('Palghar')
-    '''
-    for i in message:
-        print(i.get('title'))
-        print(i.get('description'))'''
+    live_status(19016, 'Palghar')
+    PNR_status('8108432697')     #RAC 2612829606
+    trains_btwn_stations('VIRAR','PALGHAR')
+    live_station('Palghar')
