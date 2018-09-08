@@ -22,40 +22,55 @@ def webhook():
     displayText = ""
     getIntent = req.get("queryResult").get("intent").get("displayName")
     if(getIntent == "LIVE_STATUS"):
-        getParams = req.get("queryResult").get("parameters")
-        TrainNo = int(getParams.get("trainNumber"))
-        StnName = getParams.get("stnName")
-        getQuery = req.get("queryResult").get("queryText")
-        message = live_status(TrainNo, StnName)
-        displayText = message
-        my_response = simple_response
-        simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = message
-        simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['displayText'] = message
-        
-        print(my_response)
+        my_response = _process_live_station(req)
     elif(getIntent == "TRAINS_BETWEEN_STATIONS"):
-        getParams = req.get("queryResult").get("parameters")
-        sourceStation = getParams.get("sourceStation")
-        destinationStation = getParams.get("destinationStation")
-        getQuery = req.get("queryResult").get("queryText")
-        message = f"Here are trains from {sourceStation} to {destinationStation}"
-        displayText = trains_btwn_stations(sourceStation, destinationStation)
-        my_response = list_response
+        my_response = _process_trains_btwn_stations(req)
     elif(getIntent == "PNR_STATUS"):
-        getParams = req.get("queryResult").get("parameters")
-        pnr = getParams.get("pnr")
-        message = "Here's the PNR information: "
-        displayText = PNR_status(pnr)
-        my_response = simple_response
-        simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = message
-        simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['displayText'] = displayText
-        
+        my_response = _process_pnr_station(req)
 
     r = make_response((jsonify(my_response)))
     r.headers['Authorization'] = 'Bearer ' + DEVELOPER_ACCESS_TOKEN
     r.headers['Content-Type'] = 'application/json'
     return r
     
+
+def _process_live_station(req):
+    getParams = req.get("queryResult").get("parameters")
+    TrainNo = int(getParams.get("trainNumber"))
+    StnName = getParams.get("stnName")
+    message = live_status(TrainNo, StnName)
+    displayText = message
+    simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = message
+    simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['displayText'] = message
+    return simple_response
+
+def _process_trains_btwn_stations(req):
+    getParams = req.get("queryResult").get("parameters")
+    sourceStation = getParams.get("sourceStation")
+    destinationStation = getParams.get("destinationStation")
+    title = f"Trains from {sourceStation} to {destinationStation}"
+    textToSpeech = f"Here are trains going from {sourceStation} to {destinationStation}"
+    list_of_trains = trains_btwn_stations(sourceStation, destinationStation)
+    if isinstance(list_of_trains, dict): # Check if response from the function is a dict
+        list_response['payload']['google']['systemIntent']['data']['listSelect']['title'] = title
+        list_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = textToSpeech
+        list_response['payload']['google']['systemIntent']['data']['listSelect']['items'] = list_of_trains
+        return list_response
+    else:
+        simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = list_of_trains
+        simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['displayText'] = list_of_trains
+        return simple_response
+
+
+
+def _process_pnr_station(req):
+    getParams = req.get("queryResult").get("parameters")
+    pnr = getParams.get("pnr")
+    message = "Here's the PNR information: "
+    displayText = PNR_status(pnr)
+    simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = message
+    simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['displayText'] = displayText
+    return simple_response
 
 if __name__ == '__main__':
 	port = int(os.getenv('PORT', 5002))
