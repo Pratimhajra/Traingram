@@ -5,7 +5,7 @@ from time import gmtime, strftime
 from datetime import date, datetime
 import calendar
 from json.decoder import JSONDecodeError
-#import textwrap
+from database import session, StationInfo
 
 
 def live_status(TrainNo, stnName):
@@ -49,18 +49,14 @@ def stnName_to_stnCode(stnName):
     """
     Returns Station Code for input Station Name
     """
-    stnName = stnName.upper()
-    with open("stnCodeswithStnNames.txt", "r", encoding='utf8') as f:
-        data_stream = f.read()
-        list_of_elems = []
-        # Load every comma separated string into list
-        for elem in data_stream.strip(';').split(','):
-            list_of_elems.append(elem)
-        for elem in list_of_elems:
-            if stnName == elem:
-                stnName_index = list_of_elems.index(stnName)
-                stnCode = list_of_elems[stnName_index-1]
-                return stnCode
+    station_list = []
+    stations = session.query(StationInfo).filter(StationInfo.title.like(f"%{stnName}%")).all()
+    if len(stations) > 1:
+        for station in stations:
+            station_list.append(station.station_code)
+        return station_list # Return list of similar named stations
+    return stations[0].station_code # Return the single station's station code
+        
 
 
 def trains_btwn_stations(stn1, stn2,trainTypeA=None,trainTypeB=None,trainTypeC=None):
