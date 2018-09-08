@@ -18,11 +18,9 @@ DEVELOPER_ACCESS_TOKEN = os.getenv("DEVELOPER_ACCESS_TOKEN")
 def webhook():
     start_time = time.time()
     req = request.get_json(silent=True, force=True)
-    message = ""
-    displayText = ""
     getIntent = req.get("queryResult").get("intent").get("displayName")
     if(getIntent == "LIVE_STATUS"):
-        my_response = _process_live_station(req)
+        my_response = _process_live_status(req)
     elif(getIntent == "TRAINS_BETWEEN_STATIONS"):
         my_response = _process_trains_btwn_stations(req)
     elif(getIntent == "PNR_STATUS"):
@@ -34,15 +32,23 @@ def webhook():
     return r
     
 
-def _process_live_station(req):
+def _process_live_status(req):
     getParams = req.get("queryResult").get("parameters")
     TrainNo = int(getParams.get("trainNumber"))
     StnName = getParams.get("stnName")
-    message = live_status(TrainNo, StnName)
-    displayText = message
-    simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = message
-    simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['displayText'] = message
-    return simple_response
+    stations = stnName_to_stnCode(StnName)
+    print(stations)
+    if(isinstance(stations, dict)):
+        list_response['payload']['google']['systemIntent']['data']['listSelect']['title'] = "Stations"
+        list_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = "Select station"
+        list_response['payload']['google']['systemIntent']['data']['listSelect']['items'] = stations
+        return list_response
+    else:
+        message = live_status(TrainNo, StnName)
+        displayText = message
+        simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = message
+        simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['displayText'] = message
+        return simple_response
 
 def _process_trains_btwn_stations(req):
     getParams = req.get("queryResult").get("parameters")

@@ -53,7 +53,12 @@ def stnName_to_stnCode(stnName):
     stations = session.query(StationInfo).filter(StationInfo.title.like(f"%{stnName}%")).all()
     if len(stations) > 1:
         for station in stations:
-            station_list.append(station.station_code)
+            stnCode = station.station_code
+            stnTitle = station.title
+            station_dict = {"optionInfo": {"key": f"{stnCode}"},
+                            "description": f"{stnCode}",
+                            "title": f"{stnTitle}"}
+            station_list.append(station_dict)
         return station_list # Return list of similar named stations
     return stations[0].station_code # Return the single station's station code
         
