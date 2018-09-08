@@ -8,6 +8,7 @@ from flask import make_response, jsonify
 import os
 
 from RailRider import *
+from response_templates import list_response, simple_response
 
 # Flask app should start in global layout
 app = Flask(__name__)
@@ -17,7 +18,8 @@ DEVELOPER_ACCESS_TOKEN = os.getenv("DEVELOPER_ACCESS_TOKEN")
 def webhook():
     start_time = time.time()
     req = request.get_json(silent=True, force=True)
-    
+    message = ""
+    displayText = ""
     getIntent = req.get("queryResult").get("intent").get("displayName")
     if(getIntent == "LIVE_STATUS"):
         getParams = req.get("queryResult").get("parameters")
@@ -26,6 +28,11 @@ def webhook():
         getQuery = req.get("queryResult").get("queryText")
         message = live_status(TrainNo, StnName)
         displayText = message
+        my_response = simple_response
+        simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = message
+        simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['displayText'] = message
+        
+        print(my_response)
     elif(getIntent == "TRAINS_BETWEEN_STATIONS"):
         getParams = req.get("queryResult").get("parameters")
         sourceStation = getParams.get("sourceStation")
@@ -33,28 +40,16 @@ def webhook():
         getQuery = req.get("queryResult").get("queryText")
         message = f"Here are trains from {sourceStation} to {destinationStation}"
         displayText = trains_btwn_stations(sourceStation, destinationStation)
+        my_response = list_response
     elif(getIntent == "PNR_STATUS"):
         getParams = req.get("queryResult").get("parameters")
         pnr = getParams.get("pnr")
         message = "Here's the PNR information: "
         displayText = PNR_status(pnr)
-    
-    my_response = {
-  "payload": {
-    "google": {
-      "richResponse": {
-        "items": [
-          {
-            "simpleResponse": {
-              "textToSpeech": message,
-              "displayText": displayText
-            }
-          }
-        ]
-      }
-    }
-  }
-}
+        my_response = simple_response
+        simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = message
+        simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['displayText'] = displayText
+        
 
     r = make_response((jsonify(my_response)))
     r.headers['Authorization'] = 'Bearer ' + DEVELOPER_ACCESS_TOKEN
