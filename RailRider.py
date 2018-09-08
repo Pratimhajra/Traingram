@@ -31,23 +31,17 @@ def PNR_status(pnr):
     payload = {'pnr_post':pnr}
     response=requests.post("https://www.railrider.in/api/ajax_pnr_check.php", data=payload)
     count = 1
+    
     if len(response.text) == 0:       # Response empty
         message = "Your PNR number is invalid. Please verify it or try again later."
         return message
-    data = response.json() 
-    doj = data.get('doj')
-    trainname=data.get('train_name')
-    clas = data.get('class1')
-    total_passengers = data.get('total_passengers')
-    from_station = data.get('from_station').get('name')
-    to_station = data.get('to_station').get('name')
-    total_fare = str(data.get('total_fare'))
-    cnf = data.get('passengers')
+    
+    data = response.json()
+    passengers = data.get('passengers')
     message = ""
-    for i in cnf:
-    	Passenger_no,booking_status,current_status = i['no'],i['booking_status'],i['booking_status']
-    	message += f"NO.{Passenger_no}\nBooking_status:{booking_status}\nCurrent_status:{current_status}\n"
-        #message = f"Date of journey: {doj}\nTrain Name: {trainname}\nClass: {clas}\nTotal Passengers: {total_passengers}\nFrom Station: {from_station}\nTo Station: {to_station}\nTotal Fare: {total_fare}" 
+    for passenger in passengers:
+    	Passenger_no, booking_status, current_status = passenger['no'], passenger['booking_status'], passenger['current_status']
+    	message += f"Passenger {Passenger_no}\nBooking_status:{booking_status}\nCurrent_status:{current_status}\n"
     return(message)
     
 
