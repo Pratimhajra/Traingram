@@ -150,7 +150,7 @@ def day_in_short():
 
 
 if __name__ == '__main__':
-    #live_status(19016, 'Palghar')
-    #PNR_status('8108432697')     #RAC 2612829606
-    print(trains_btwn_stations('BORIVALI','PALGHAR'))
-    #live_station('Palghar')
+    live_status(19016, 'Palghar')
+    PNR_status('8108432697')     #RAC 2612829606
+    trains_btwn_stations('BORIVALI','PALGHAR')
+    live_station('Palghar')
