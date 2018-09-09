@@ -6,6 +6,7 @@ from datetime import date, datetime
 import calendar
 from json.decoder import JSONDecodeError
 from database import session, StationInfo
+from pure_python_parser import parse_json
 
 
 def live_status(TrainNo, stnName):
@@ -64,65 +65,34 @@ def stnName_to_stnCode(stnName):
         
 
 
-def trains_btwn_stations(stn1, stn2,trainTypeA=None,trainTypeB=None,trainTypeC=None):
-    date = strftime("%d", gmtime())
-    stnc1 = stnName_to_stnCode(stn1)
-    stnc2 = stnName_to_stnCode(stn2)
-    dayInShort = day_in_short()                             #Calculating short names for week days
-    CurrentTime = datetime.now().strftime('%H:%M')          #Taking the time when user call the function
-    TimeSplit = CurrentTime.split(":")                      #spliting the time to get hour
-    HourTime = int(TimeSplit[0])                            #Converting to integer value
-    time_till = HourTime + 4                                #Calculating the maximum search limit that is 4 hours
-    noFilter=0
-    if(trainTypeA==trainTypeB and trainTypeB==trainTypeC and trainTypeC==None):
-        noFilter=1
-    response=requests.get(f"https://api.railrider.in/api_rr_v3_test.php?page_type=train_between_station&from={stn1}+-+{stnc1}&to={stn2}+-+{stnc2}&day=Sa")
-    try:
-        data=response.json()
-    except JSONDecodeError:
-        return "Multiple Stations exist!"
-
-    TotalResults = data['total_results']
-    FirstTrain = data['result'][0]['trainno']
-    train_numbers = []
-    ActualTrains = 1
-    i = 0
-    #Calculating the number of trains in a day between station 1  and  station 2
-    while i<TotalResults:
-        if i == 0:
-            i += 1
-        if FirstTrain != data['result'][i]['trainno']:
-            ActualTrains+=1
-            i += 1
-        if FirstTrain == data['result'][i]['trainno']:  
-            break
-    i = 0
+def trains_btwn_stations(stn1, stn2, viaStn="null", trainType="ALL"):
+    base_URL = "https://enquiry.indianrail.gov.in/ntes/"
     message = []
-    while i < ActualTrains:
-        AreTrainsAvail = 0
-        TrainName = data['result'][i]['train_name']
-        if(data['result'][i]['train_type']==trainTypeA or data['result'][i]['train_type']==trainTypeB or data['result'][i]['train_type']==trainTypeC or noFilter):
-            
-            DepartTime1 = data['result'][i]['from_dep_time']            #Train's departure time from station 1
-            ArriveTime2 = data['result'][i]['to_dep_time']              #Train's arrival time at station 2
-            time24 = time.strptime(DepartTime1, "%H:%M")                #Time in 24 hour fashion
-            DepartureTime = time.strftime( "%H:%M", time24 )
-            DepartHour = str(DepartureTime)                             #Converting tuple to string
-            TimeSplitList = DepartHour.split(":")   
-            TimeInHours = int(TimeSplitList[0])                         #Converting string into integer
-            DepartTime1 = time.strftime( "%I:%M %p", time24 )           #Conversion from 24 hr. fashion to 12 hr. fashion for Departure time from station 1
-            ArriveTime2 = time.strftime( "%I:%M %p",time.strptime(ArriveTime2, "%H:%M")) #Conversion from 24 hr. fashion to 12 hr. fashion for Arrival time at station 2
-            TrainNumber = data['result'][i]['trainno']
-            if time_till >= TimeInHours and TimeInHours>=HourTime:  
-                AllTrainDetails = {"optionInfo": {"key": f"{TrainNumber}"},
-                                    "description": f"Departsa from {stn1} at {DepartTime1}\nWill arrive in {stn2} by {ArriveTime2}",
-                                    "title": f"{TrainName}"}
-                message.append(AllTrainDetails)                         #Concatinating the dictionaries
-                AreTrainsAvail +=1                                 
+    i = 0
+    stn1 = stnName_to_stnCode(stn1)
+    stn2 = stnName_to_stnCode(stn2)
+    query_url = base_URL+f"NTES?action=getTrnBwStns&stn1={stn1}&stn2={stn2}&trainType={trainType}"
+    if(viaStn != "null"):
+        viaStn = stnName_to_stnCode(viaStn)
+        query_url = query_url+f"&viaStn={viaStn}"
+    r = requests.get(query_url)
+    json_data = parse_json(r.text, ["runsOnDays", "trnName"])
+    variable = list(json_data.keys())[0]
+    trains=json_data[variable]["trains"]["direct"]
+    message1="Trains going from  "+stn1+" to "+stn2+" are: \n"
+    for train in trains:
+        TrainNumber = train["trainNo"]
+        TrainName = train["trainName"]
+        #message+="\nName: "+ train["trainName"]+"\nTrain number:"+train["trainNo"]+"\nOperational: "+train["runsFromStn"]
+        AllTrainDetails = {"optionInfo": {"key": f"{TrainNumber}"},
+                            "description": f"Departsa from {stn1} Will arrive in {stn2}",
+                            "title": f"{TrainName}"}
+        message.append(AllTrainDetails) 
         i+=1
-    if  AreTrainsAvail == 0:                                            #Checking for NULL directionary
-        message = "No trains available in next 4 hours"
-    return message
+    if(i == 1):
+        return("\nName: "+ TrainName+"\nTrain number:"+TrainNumber+"\nDeparts from: "+stn1+"\nwill arrive in"+stn2)
+    else:
+        return message
 
 
 def live_station(stnName, hrs=2):
@@ -177,7 +147,7 @@ def day_in_short():
 
 
 if __name__ == '__main__':
-    live_status(19016, 'Palghar')
-    PNR_status('8108432697')     #RAC 2612829606
-    trains_btwn_stations('VIRAR','PALGHAR')
-    live_station('Palghar')
+    #live_status(19016, 'Palghar')
+    #PNR_status('8108432697')     #RAC 2612829606
+    print(trains_btwn_stations('BORIVALI','PALGHAR'))
+    #live_station('Palghar')
