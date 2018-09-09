@@ -92,7 +92,7 @@ def trains_btwn_stations(stn1, stn2, viaStn="null", trainType="ALL"):
         message.append(AllTrainDetails)
 
     if(len(trains) == 1):
-        message = "\nName: "+ TrainName+"\nTrain number:"+TrainNumber+"\nDeparts from: "+stn1+"\nwill arrive in"+stn2
+        message = "\nName: "+ TrainName+"\nTrain number:"+TrainNumber+"\nDeparts from: "+Source_Stn+"\nwill arrive in"+Destination_Stn
         return message
     else:
         return message
