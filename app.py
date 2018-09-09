@@ -49,6 +49,9 @@ def _process_live_status(req):
         return simple_response
 
 def _process_trains_btwn_stations(req):
+    #NOTE: WE CANNOT PASS STATION CODES AND GET RESULTS.
+    #FIGURE OUT HOW TO DIFFERENTIATE STN_CODES FROM STN_NAMES
+    #OR CHANGE OptionInfo{"key": <value>}
     getParams = req.get("queryResult").get("parameters")
     sourceStation = getParams.get("sourceStation")
     destinationStation = getParams.get("destinationStation")

@@ -87,7 +87,6 @@ def trains_btwn_stations(stn1, stn2, viaStn="null", trainType="ALL"):
         Source_Stn = train["fromStn"]
         Destination_Stn = train["toStn"]
         AllTrainDetails = {"optionInfo": {"key": f"{TrainNumber}"},
-                            "description": f"{stn1} → {stn2}",
                             "title": f"{TrainName} ({TrainNumber})"}
         message.append(AllTrainDetails)
 
