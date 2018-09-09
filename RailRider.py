@@ -91,7 +91,8 @@ def trains_btwn_stations(stn1, stn2, viaStn="null", trainType="ALL"):
         message.append(AllTrainDetails) 
         i+=1
     if(i == 1):
-        return("\nName: "+ TrainName+"\nTrain number:"+TrainNumber+"\nDeparts from: "+stn1+"\nwill arrive in"+stn2)
+        message1 += "\nName: "+ TrainName+"\nTrain number:"+TrainNumber+"\nDeparts from: "+stn1+"\nwill arrive in"+stn2
+        return message1
     else:
         return message
 
@@ -148,7 +149,7 @@ def day_in_short():
 
 
 if __name__ == '__main__':
-    #live_status(19016, 'Palghar')
-    #PNR_status('8108432697')     #RAC 2612829606
-    print(trains_btwn_stations('BORIVALI','PALGHAR'))
-    #live_station('Palghar')
+    live_status(19016, 'Palghar')
+    PNR_status('8108432697')     #RAC 2612829606
+    trains_btwn_stations('BORIVALI','PALGHAR')
+    live_station('Palghar')
