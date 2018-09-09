@@ -2,6 +2,9 @@ import requests
 from pure_python_parser import parse_json
 import time
 import json
+from database import session, StationInfo
+
+base_URL = "https://enquiry.indianrail.gov.in/ntes/"
 
 def trains_btwn_stations(stn1, stn2, viaStn="null", trainType="ALL"):
     stn1 = stnName_to_stnCode(stn1)
@@ -20,19 +23,22 @@ def trains_btwn_stations(stn1, stn2, viaStn="null", trainType="ALL"):
     return message
 
 def stnName_to_stnCode(stnName):
-    stnName = stnName.upper()
-    with open("stnCodeswithStnNames.txt", "r", encoding='utf8') as f:
-        data_stream = f.read()
-        list_of_elems = []
-        
-        # Load every comma separated string into list
-        for elem in data_stream.strip(';').split(','):
-            list_of_elems.append(elem)
-        for elem in list_of_elems:
-            if stnName == elem:
-                stnName_index = list_of_elems.index(stnName)
-                stnCode = list_of_elems[stnName_index-1]
-                return stnCode
+    """
+    Returns Station Code for input Station Name
+    """
+    station_list = []
+    stations = session.query(StationInfo).filter(StationInfo.title.like(f"%{stnName}%")).all()
+    print(stations)
+    if len(stations) > 1:
+        for station in stations:
+            stnCode = station.station_code
+            stnTitle = station.title
+            station_dict = {"optionInfo": {"key": f"{stnCode}"},
+                            "description": f"{stnCode}",
+                            "title": f"{stnTitle}"}
+            station_list.append(station_dict)
+        return station_list # Return list of similar named stations
+    return stations[0].station_code # Return the single station's station code
 
 if __name__ == "__main__":
-    print(trains_btwn_stations('VR', 'PLG'))
+    print(trains_btwn_stations('palghar', 'borivali'))
