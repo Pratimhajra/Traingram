@@ -68,31 +68,32 @@ def stnName_to_stnCode(stnName):
 def trains_btwn_stations(stn1, stn2, viaStn="null", trainType="ALL"):
     base_URL = "https://enquiry.indianrail.gov.in/ntes/"
     message = []
-    i = 0
     stn1 = stnName_to_stnCode(stn1)
     stn2 = stnName_to_stnCode(stn2)
     query_url = base_URL+f"NTES?action=getTrnBwStns&stn1={stn1}&stn2={stn2}&trainType={trainType}"
+    
     if(viaStn != "null"):
         viaStn = stnName_to_stnCode(viaStn)
         query_url = query_url+f"&viaStn={viaStn}"
+    
     r = requests.get(query_url)
     json_data = parse_json(r.text, ["runsOnDays", "trnName"])
     variable = list(json_data.keys())[0]
-    trains=json_data[variable]["trains"]["direct"]
-    message1="Trains going from  "+stn1+" to "+stn2+" are: \n"
+    trains = json_data[variable]["trains"]["direct"]
+    
     for train in trains:
         TrainNumber = train["trainNo"]
         TrainName = train["trainName"]
         Source_Stn = train["fromStn"]
         Destination_Stn = train["toStn"]
         AllTrainDetails = {"optionInfo": {"key": f"{TrainNumber}"},
-                            "description": f"Departsa from {Source_Stn} Will arrive in {Destination_Stn}",
-                            "title": f"{TrainName}"}
-        message.append(AllTrainDetails) 
-        i+=1
-    if(i == 1):
-        message1 += "\nName: "+ TrainName+"\nTrain number:"+TrainNumber+"\nDeparts from: "+stn1+"\nwill arrive in"+stn2
-        return message1
+                            "description": f"{stn1} → {stn2}",
+                            "title": f"{TrainName} ({TrainNumber})"}
+        message.append(AllTrainDetails)
+
+    if(len(trains) == 1):
+        message = "\nName: "+ TrainName+"\nTrain number:"+TrainNumber+"\nDeparts from: "+stn1+"\nwill arrive in"+stn2
+        return message
     else:
         return message
 

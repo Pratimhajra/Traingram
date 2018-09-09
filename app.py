@@ -37,15 +37,13 @@ def _process_live_status(req):
     TrainNo = int(getParams.get("trainNumber"))
     StnName = getParams.get("stnName")
     stations = stnName_to_stnCode(StnName)
-    print(stations)
-    if(isinstance(stations, dict)):
+    if(isinstance(stations, list)): # Check if response from the function is a list of dicts
         list_response['payload']['google']['systemIntent']['data']['listSelect']['title'] = "Stations"
         list_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = "Select station"
         list_response['payload']['google']['systemIntent']['data']['listSelect']['items'] = stations
         return list_response
     else:
         message = live_status(TrainNo, StnName)
-        displayText = message
         simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = message
         simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['displayText'] = message
         return simple_response
@@ -57,7 +55,7 @@ def _process_trains_btwn_stations(req):
     title = f"Trains from {sourceStation} to {destinationStation}"
     textToSpeech = f"Here are trains going from {sourceStation} to {destinationStation}"
     list_of_trains = trains_btwn_stations(sourceStation, destinationStation)
-    if isinstance(list_of_trains, dict): # Check if response from the function is a dict
+    if(isinstance(list_of_trains, list)): # Check if response from the function is a list of dicts
         list_response['payload']['google']['systemIntent']['data']['listSelect']['title'] = title
         list_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = textToSpeech
         list_response['payload']['google']['systemIntent']['data']['listSelect']['items'] = list_of_trains
