@@ -45,7 +45,6 @@ def _process_live_status(req):
         return list_response
     else:
         message = live_status(TrainNo, StnName)
-        displayText = message
         simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = message
         simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['displayText'] = message
         return simple_response
