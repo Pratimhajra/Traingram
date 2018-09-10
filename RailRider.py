@@ -104,8 +104,6 @@ def live_station(stnName, hrs=2):
     stnCode = stnName_to_stnCode(stnName)               
     response = requests.get(f"http://whereismytrain.in/cache/live_station?hrs={hrs}&station_code={stnCode}")
     data = response.json()
-    print(data)
-    print('\n\n =================================', response.text)
     message = []
     for train in data.get('live_station_info', []):
         train_no = train.get('train_no')
@@ -130,6 +128,7 @@ def live_station(stnName, hrs=2):
                                 "description": f"Will arrive on platform : {platform} at {DepartTimeFinal}",
                                 "title": f"{name}"}
             message.append(All_train_details)
+    print("MESSAGE:\n", message)
     return message
 
 
