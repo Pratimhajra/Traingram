@@ -25,7 +25,7 @@ def webhook():
         my_response = _process_trains_btwn_stations(req)
     elif(getIntent == "PNR_STATUS"):
         my_response = _process_pnr_station(req)
-    elif(getIntent == "LIVE_STATION"):
+    elif(getIntent == "LIVE_STATIONs"):
         my_response = _process_live_station(req)
 
     r = make_response((jsonify(my_response)))
