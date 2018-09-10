@@ -125,7 +125,7 @@ def live_station(stnName, hrs=2):
             DepartTimeFinal = time.strftime( "%I:%M %p",time.strptime(DepartTime[0], "%H:%M"))
             name = train.get('train_name')
             All_train_details = {"optionInfo": {"key": f"{train_no}"},
-                                "description": f"Will arrive on platform : {platform} at {DepartTimeFinal}\n Delay : {delay}",
+                                "description": f"Will arrive on platform : {platform} at {DepartTimeFinal}",
                                 "title": f"{name}"}
             message.append(All_train_details)
     return message
