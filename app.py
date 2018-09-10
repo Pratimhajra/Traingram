@@ -99,6 +99,8 @@ def _process_live_station(req):
     title = f"Trains at {stnName}"
     textToSpeech = f"Here are trains at {stnName}"
     live_station_output = live_station(stnName)
+    print(live_station_output)
+    print(len(live_station_output))
     if(isinstance(stations, list)): # Check if response from stationName to Code is a list
         list_response['payload']['google']['systemIntent']['data']['listSelect']['title'] = "Stations"
         list_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = "Please select a Station"
