@@ -96,6 +96,7 @@ def _process_live_station(req):
     getParams = req.get("queryResult").get('parameters')
     stnName = getParams.get("stnName")
     stations = stnName_to_stnCode(stnName)
+    print(stations, "\n", stnName)
     title = f"Trains at {stnName}"
     textToSpeech = f"Here are trains at {stnName}"
     live_station_output = live_station(stnName)
