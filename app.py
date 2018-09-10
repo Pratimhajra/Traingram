@@ -54,18 +54,29 @@ def _process_trains_btwn_stations(req):
     destinationStation = getParams.get("destinationStation")
     title = f"Trains from {sourceStation} to {destinationStation}"
     textToSpeech = f"Here are trains going from {sourceStation} to {destinationStation}"
-    list_of_trains = trains_btwn_stations(sourceStation, destinationStation)
-    if(isinstance(list_of_trains, list)): # Check if response from the function is a list of dicts
-        list_response['payload']['google']['systemIntent']['data']['listSelect']['title'] = title
-        list_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = textToSpeech
-        list_response['payload']['google']['systemIntent']['data']['listSelect']['items'] = list_of_trains
+    source_station = stnName_to_stnCode(sourceStation)
+    destination_station = stnName_to_stnCode(destinationStation)
+    if(isinstance(list_of_stnCode_src, list)):
+        list_response['payload']['google']['systemIntent']['data']['listSelect']['title'] = "Stations"
+        list_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = f"Here are the stations I found"
+        list_response['payload']['google']['systemIntent']['data']['listSelect']['items'] = list_of_stnCode_src
+        return list_response
+    if(isinstance(list_of_stnCode_destn, list)):   
+        list_response['payload']['google']['systemIntent']['data']['listSelect']['title'] = "Stations"
+        list_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = f"Here are the stations I found"
+        list_response['payload']['google']['systemIntent']['data']['listSelect']['items'] = list_of_stnCode_dest
         return list_response
     else:
-        simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = list_of_trains
-        simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['displayText'] = list_of_trains
-        return simple_response
-
-
+        list_of_trains = trains_btwn_stations(sourceStation, destinationStation)
+        if(isinstance(list_of_trains, list)): # Check if response from the function is a list of dicts
+            list_response['payload']['google']['systemIntent']['data']['listSelect']['title'] = title
+            list_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = textToSpeech
+            list_response['payload']['google']['systemIntent']['data']['listSelect']['items'] = list_of_trains
+            return list_response
+        else:
+            simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = list_of_trains
+            simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['displayText'] = list_of_trains
+            return simple_response
 
 def _process_pnr_station(req):
     getParams = req.get("queryResult").get("parameters")

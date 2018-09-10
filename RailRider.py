@@ -60,8 +60,10 @@ def stnName_to_stnCode(stnName):
                             "description": f"{stnCode}",
                             "title": f"{stnTitle}"}
             station_list.append(station_dict)
-        return station_list # Return list of similar named stations
-    return stations[0].station_code # Return the single station's station code
+    if len(stations) == 1:
+        station_list = f"{stnCode}"
+    return station_list # Return list of similar named stations
+    #return stations[0].station_code # Return the single station's station code
         
 
 
@@ -93,9 +95,7 @@ def trains_btwn_stations(stn1, stn2, viaStn="null", trainType="ALL"):
 
     if(len(trains) == 1):
         message = "\nName: "+ TrainName+"\nTrain number:"+TrainNumber+"\nDeparts from: "+Source_Stn+"\nwill arrive in"+Destination_Stn
-        return message
-    else:
-        return message
+    return message
 
 
 def live_station(stnName, hrs=2):
@@ -152,5 +152,6 @@ def day_in_short():
 if __name__ == '__main__':
     live_status(19016, 'Palghar')
     PNR_status('8108432697')     #RAC 2612829606
+    stnName_to_stnCode('BORIVALI')
     trains_btwn_stations('BORIVALI','PALGHAR')
     live_station('Palghar')
