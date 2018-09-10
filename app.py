@@ -102,21 +102,23 @@ def _process_live_station(req):
     live_station_output = live_station(stnName)
     print(live_station_output)
     print(len(live_station_output))
+    """
     if(isinstance(stations, list)): # Check if response from stationName to Code is a list
         list_response['payload']['google']['systemIntent']['data']['listSelect']['title'] = "Stations"
         list_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = "Please select a Station"
         list_response['payload']['google']['systemIntent']['data']['listSelect']['items'] = stations
         return list_response
     else:
-        if isinstance(live_station_output, list):
-            list_response['payload']['google']['systemIntent']['data']['listSelect']['title'] = title
-            list_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = textToSpeech
-            list_response['payload']['google']['systemIntent']['data']['listSelect']['items'] = live_station_output
-            return list_response
-        else:
-            simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = live_station_output
-            simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['displayText'] = live_station_output
-            return simple_response
+    """
+    if isinstance(live_station_output, list):
+        list_response['payload']['google']['systemIntent']['data']['listSelect']['title'] = title
+        list_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = textToSpeech
+        list_response['payload']['google']['systemIntent']['data']['listSelect']['items'] = live_station_output
+        return list_response
+    else:
+        simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = live_station_output
+        simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['displayText'] = live_station_output
+        return simple_response
 
 if __name__ == '__main__':
 	port = int(os.getenv('PORT', 5002))
