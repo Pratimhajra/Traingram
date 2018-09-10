@@ -60,10 +60,8 @@ def stnName_to_stnCode(stnName):
                             "description": f"{stnCode}",
                             "title": f"{stnTitle}"}
             station_list.append(station_dict)
-    if len(stations) == 1:
-        station_list = f"{stnCode}"
-    return station_list # Return list of similar named stations
-    #return stations[0].station_code # Return the single station's station code
+        return station_list # Return list of similar named stations
+    return stations[0].station_code # Return the single station's station code
         
 
 

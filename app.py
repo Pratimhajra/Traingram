@@ -95,18 +95,25 @@ def _process_pnr_station(req):
 def _process_live_station(req):
     getParams = req.get("queryResult").get('parameters')
     stnName = getParams.get("stnName")
+    stations = stnName_to_stnCode(stnName)
     title = f"Trains at {stnName}"
     textToSpeech = f"Here are trains at {stnName}"
-    displayText = live_station(stnName)
-    if(isinstance(list_of_trains, list)): # Check if response from the function is a list of dicts
-        list_response['payload']['google']['systemIntent']['data']['listSelect']['title'] = title
-        list_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = textToSpeech
-        list_response['payload']['google']['systemIntent']['data']['listSelect']['items'] = list_of_trains
+    live_station_output = live_station(stnName)
+    if(isinstance(stations, list)): # Check if response from stationName to Code is a list
+        list_response['payload']['google']['systemIntent']['data']['listSelect']['title'] = "Stations"
+        list_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = "Please select a Station"
+        list_response['payload']['google']['systemIntent']['data']['listSelect']['items'] = stations
         return list_response
     else:
-        simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = list_of_trains
-        simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['displayText'] = list_of_trains
-        return simple_response
+        if isinstance(live_station_output, list):
+            list_response['payload']['google']['systemIntent']['data']['listSelect']['title'] = title
+            list_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = textToSpeech
+            list_response['payload']['google']['systemIntent']['data']['listSelect']['items'] = live_station_output
+            return list_response
+        else:
+            simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = live_station_output
+            simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['displayText'] = live_station_output
+            return simple_response
 
 if __name__ == '__main__':
 	port = int(os.getenv('PORT', 5002))
