@@ -25,6 +25,8 @@ def webhook():
         my_response = _process_trains_btwn_stations(req)
     elif(getIntent == "PNR_STATUS"):
         my_response = _process_pnr_station(req)
+    elif(getIntent == "LIVE_STATION"):
+        my_response = _process_live_station(req)
 
     r = make_response((jsonify(my_response)))
     r.headers['Authorization'] = 'Bearer ' + DEVELOPER_ACCESS_TOKEN
@@ -89,6 +91,22 @@ def _process_pnr_station(req):
     simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = message
     simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['displayText'] = displayText
     return simple_response
+
+def _process_live_station(req):
+    getParams = req.get("queryResult").get('parameters')
+    stnName = getParams.get("stnName")
+    title = f"Trains at {stnName}"
+    textToSpeech = f"Here are trains at {stnName}"
+    displayText = live_station(stnName)
+    if(isinstance(list_of_trains, list)): # Check if response from the function is a list of dicts
+        list_response['payload']['google']['systemIntent']['data']['listSelect']['title'] = title
+        list_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = textToSpeech
+        list_response['payload']['google']['systemIntent']['data']['listSelect']['items'] = list_of_trains
+        return list_response
+    else:
+        simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = list_of_trains
+        simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['displayText'] = list_of_trains
+        return simple_response
 
 if __name__ == '__main__':
 	port = int(os.getenv('PORT', 5002))
