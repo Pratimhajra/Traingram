@@ -14,11 +14,15 @@ def live_status(TrainNo, stnName):
     today=datetime.now()
     date=today.strftime("%d-%m-%Y")
     delay = 9999         # Default value of delay
-    response=requests.get(f"http://whereismytrain.in/cache/live_status?date={date}&train_no={TrainNo}")
+    i=1
+    fromDay = from_day(stnName,TrainNo,i)
+    response=requests.get(f"http://whereismytrain.in/cache/live_status?date={date}&from_day={fromDay}&train_no={TrainNo}")
+    #responese=requests.get(f"http://whereismytrain.in/cache/live_status?date=11-09-2018&from_day=2&train_no=19016")
     data=response.json()
     for station in data.get('days_schedule'):
         if(station.get('station_code') == stnCode):
-            delay = station.get('delay_in_arrival')
+            delay=station.get('delay_in_arrival')
+
     if delay is None or delay == 0:
         return "The train is on time!"
     elif delay != 9999:
@@ -26,7 +30,6 @@ def live_status(TrainNo, stnName):
         return message
     else:
         return f"The given train doesn't run through {stnName}"
-
 
 def PNR_status(pnr):
     payload = {'pnr_post':pnr}
@@ -148,9 +151,23 @@ def day_in_short():
         day_code = day[0:2]
     return day_code
 
-
+def from_day(stnName,trainNo,from_day_value):
+    stnCode = stnName_to_stnCode(stnName)
+    today=datetime.now()
+    date=today.strftime("%d-%m-%Y")
+    formattedDate = today.strftime("%d %b %Y")
+    response=requests.get(f"http://whereismytrain.in/cache/live_status?date={date}&from_day={from_day_value}&train_no={trainNo}")
+    data=response.json()
+    for station in data.get('days_schedule'):
+        if(station.get('station_code') == stnCode):
+            arrival_date = station.get('actual_arrival_date')
+            if(arrival_date == formattedDate):
+                return from_day_value
+            else:
+                from_day_value+=1
+                return from_day(stnName,trainNo,from_day_value)
 if __name__ == '__main__':
-    live_status(19016, 'Palghar')
-    PNR_status('8108432697')     #RAC 2612829606
-    trains_btwn_stations('BORIVALI','PALGHAR')
-    live_station('Palghar')
+    print(live_status(19016, 'Palghar'))
+    #PNR_status('8108432697')     #RAC 2612829606
+    #trains_btwn_stations('BORIVALI','PALGHAR')
+    #live_station('Palghar')
