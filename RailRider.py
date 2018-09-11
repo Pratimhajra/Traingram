@@ -14,14 +14,7 @@ def live_status(TrainNo, stnName):
     today=datetime.now()
     date=today.strftime("%d-%m-%Y")
     delay = 9999         # Default value of delay
-    #i=1
     delay = from_day(TrainNo,stnCode,date,1)
-    #response=requests.get(f"http://whereismytrain.in/cache/live_status?date={date}&from_day={fromDay}&train_no={TrainNo}")
-    #data=response.json()
-    #for station in data.get('days_schedule'):
-    #    if(station.get('station_code') == stnCode):
-    #        delay=station.get('delay_in_arrival')
-
     if delay is None or delay == 0:
         return "The train is on time!"
     elif delay != 9999:
@@ -145,7 +138,6 @@ def from_day(TrainNo,stnCode,date,from_day_value):
             else:
                 from_day_value+=1
                 return from_day(TrainNo,stnCode,date,from_day_value)
-
 
 if __name__ == '__main__':
     print(live_status(19016, 'Palghar'))
