@@ -25,6 +25,8 @@ def webhook():
         my_response = _process_trains_btwn_stations(req)
     elif(getIntent == "PNR_STATUS"):
         my_response = _process_pnr_station(req)
+    elif(getIntent == "LIVE_STATIONS"):
+        my_response = _process_live_station(req)
 
     r = make_response((jsonify(my_response)))
     r.headers['Authorization'] = 'Bearer ' + DEVELOPER_ACCESS_TOKEN
@@ -49,23 +51,37 @@ def _process_live_status(req):
         return simple_response
 
 def _process_trains_btwn_stations(req):
+    #NOTE: WE CANNOT PASS STATION CODES AND GET RESULTS.
+    #FIGURE OUT HOW TO DIFFERENTIATE STN_CODES FROM STN_NAMES
+    #OR CHANGE OptionInfo{"key": <value>}
     getParams = req.get("queryResult").get("parameters")
     sourceStation = getParams.get("sourceStation")
     destinationStation = getParams.get("destinationStation")
     title = f"Trains from {sourceStation} to {destinationStation}"
     textToSpeech = f"Here are trains going from {sourceStation} to {destinationStation}"
-    list_of_trains = trains_btwn_stations(sourceStation, destinationStation)
-    if(isinstance(list_of_trains, list)): # Check if response from the function is a list of dicts
-        list_response['payload']['google']['systemIntent']['data']['listSelect']['title'] = title
-        list_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = textToSpeech
-        list_response['payload']['google']['systemIntent']['data']['listSelect']['items'] = list_of_trains
+    source_station = stnName_to_stnCode(sourceStation)
+    destination_station = stnName_to_stnCode(destinationStation)
+    if(isinstance(list_of_stnCode_src, list)):
+        list_response['payload']['google']['systemIntent']['data']['listSelect']['title'] = "Stations"
+        list_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = f"Here are the stations I found"
+        list_response['payload']['google']['systemIntent']['data']['listSelect']['items'] = list_of_stnCode_src
+        return list_response
+    if(isinstance(list_of_stnCode_destn, list)):   
+        list_response['payload']['google']['systemIntent']['data']['listSelect']['title'] = "Stations"
+        list_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = f"Here are the stations I found"
+        list_response['payload']['google']['systemIntent']['data']['listSelect']['items'] = list_of_stnCode_dest
         return list_response
     else:
-        simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = list_of_trains
-        simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['displayText'] = list_of_trains
-        return simple_response
-
-
+        list_of_trains = trains_btwn_stations(sourceStation, destinationStation)
+        if(isinstance(list_of_trains, list)): # Check if response from the function is a list of dicts
+            list_response['payload']['google']['systemIntent']['data']['listSelect']['title'] = title
+            list_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = textToSpeech
+            list_response['payload']['google']['systemIntent']['data']['listSelect']['items'] = list_of_trains
+            return list_response
+        else:
+            simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = list_of_trains
+            simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['displayText'] = list_of_trains
+            return simple_response
 
 def _process_pnr_station(req):
     getParams = req.get("queryResult").get("parameters")
@@ -75,6 +91,34 @@ def _process_pnr_station(req):
     simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = message
     simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['displayText'] = displayText
     return simple_response
+
+def _process_live_station(req):
+    getParams = req.get("queryResult").get('parameters')
+    stnName = getParams.get("stnName")
+    stations = stnName_to_stnCode(stnName)
+    print(stations, "\n", stnName)
+    title = f"Trains at {stnName}"
+    textToSpeech = f"Here are trains at {stnName}"
+    live_station_output = live_station(stnName)
+    print(live_station_output)
+    print(len(live_station_output))
+    """
+    if(isinstance(stations, list)): # Check if response from stationName to Code is a list
+        list_response['payload']['google']['systemIntent']['data']['listSelect']['title'] = "Stations"
+        list_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = "Please select a Station"
+        list_response['payload']['google']['systemIntent']['data']['listSelect']['items'] = stations
+        return list_response
+    else:
+    """
+    if isinstance(live_station_output, list):
+        list_response['payload']['google']['systemIntent']['data']['listSelect']['title'] = title
+        list_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = textToSpeech
+        list_response['payload']['google']['systemIntent']['data']['listSelect']['items'] = live_station_output
+        return list_response
+    else:
+        simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = live_station_output
+        simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['displayText'] = live_station_output
+        return simple_response
 
 if __name__ == '__main__':
 	port = int(os.getenv('PORT', 5002))
