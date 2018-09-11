@@ -61,15 +61,15 @@ def _process_trains_btwn_stations(req):
     textToSpeech = f"Here are trains going from {sourceStation} to {destinationStation}"
     source_station = stnName_to_stnCode(sourceStation)
     destination_station = stnName_to_stnCode(destinationStation)
-    if(isinstance(list_of_stnCode_src, list)):
+    if(isinstance(source_station, list)):
         list_response['payload']['google']['systemIntent']['data']['listSelect']['title'] = "Stations"
         list_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = f"Here are the stations I found"
-        list_response['payload']['google']['systemIntent']['data']['listSelect']['items'] = list_of_stnCode_src
+        list_response['payload']['google']['systemIntent']['data']['listSelect']['items'] = source_station
         return list_response
-    if(isinstance(list_of_stnCode_destn, list)):   
+    if(isinstance(destination_station, list)):   
         list_response['payload']['google']['systemIntent']['data']['listSelect']['title'] = "Stations"
         list_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = f"Here are the stations I found"
-        list_response['payload']['google']['systemIntent']['data']['listSelect']['items'] = list_of_stnCode_dest
+        list_response['payload']['google']['systemIntent']['data']['listSelect']['items'] = destination_station
         return list_response
     else:
         list_of_trains = trains_btwn_stations(sourceStation, destinationStation)
