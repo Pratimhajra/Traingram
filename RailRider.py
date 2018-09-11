@@ -161,6 +161,7 @@ def from_day(stnName,trainNo,from_day_value):
             else:
                 from_day_value+=1
                 return from_day(stnName,trainNo,from_day_value)
+
 if __name__ == '__main__':
     print(live_status(19016, 'Palghar'))
     #PNR_status('8108432697')     #RAC 2612829606
