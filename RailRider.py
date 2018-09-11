@@ -9,7 +9,7 @@ from database import session, StationInfo,TrainInfo
 from pure_python_parser import parse_json
 
 
-def live_status(TrainName, stnName):
+def live_status(TrainNo, stnName):
     stnCode = stnName_to_stnCode(stnName)
     today=datetime.now()
     date=today.strftime("%d-%m-%Y")
@@ -144,7 +144,7 @@ def from_day(TrainNo,stnCode,date,from_day_value):
 def trainName_to_trainCode(trainName):      
     trainList=[]  
     trains = session.query(TrainInfo).filter(TrainInfo.train_name.like(f"%{trainName}%")).all()  
-    if(len(trains)<=1):  
+    if(len(trains)==1): #Returns train no if list contains one item 
         return trains[0].train_no      
     else:  
         for train in trains:  
@@ -158,7 +158,7 @@ def trainName_to_trainCode(trainName):
 
 
 if __name__ == '__main__':
-    '''print(live_status(19016, 'Palghar'))
+    print(live_status(19016, 'Palghar'))
     #PNR_status('8108432697')     #RAC 2612829606
     #trains_btwn_stations('BORIVALI','PALGHAR')
-    #live_station('Palghar')'''
+    #live_station('Palghar')
