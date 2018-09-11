@@ -138,7 +138,7 @@ def from_day(TrainNo,stnCode,date,from_day_value):
                 return station.get('delay_in_arrival')
             else:
                 from_day_value+=1
-                return from_day(stnName,trainNo,from_day_value)
+                return from_day(TrainNo, stnCode, date, from_day_value)
 
 
 def trainName_to_trainCode(trainName):      
