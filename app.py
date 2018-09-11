@@ -18,6 +18,7 @@ DEVELOPER_ACCESS_TOKEN = os.getenv("DEVELOPER_ACCESS_TOKEN")
 def webhook():
     start_time = time.time()
     req = request.get_json(silent=True, force=True)
+    print(req)
     getIntent = req.get("queryResult").get("intent").get("displayName")
     if(getIntent == "LIVE_STATUS"):
         my_response = _process_live_status(req)
