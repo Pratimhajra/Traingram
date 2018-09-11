@@ -5,11 +5,11 @@ from time import gmtime, strftime
 from datetime import date, datetime
 import calendar
 from json.decoder import JSONDecodeError
-from database import session, StationInfo
+from database import session, StationInfo,TrainInfo
 from pure_python_parser import parse_json
 
 
-def live_status(TrainNo, stnName):
+def live_status(TrainName, stnName):
     stnCode = stnName_to_stnCode(stnName)
     today=datetime.now()
     date=today.strftime("%d-%m-%Y")
@@ -22,6 +22,7 @@ def live_status(TrainNo, stnName):
         return message
     else:
         return f"The given train doesn't run through {stnName}"
+
 
 def PNR_status(pnr):
     payload = {'pnr_post':pnr}
@@ -137,10 +138,27 @@ def from_day(TrainNo,stnCode,date,from_day_value):
                 return station.get('delay_in_arrival')
             else:
                 from_day_value+=1
-                return from_day(TrainNo,stnCode,date,from_day_value)
+                return from_day(stnName,trainNo,from_day_value)
+
+
+def trainName_to_trainCode(trainName):      
+    trainList=[]  
+    trains = session.query(TrainInfo).filter(TrainInfo.train_name.like(f"%{trainName}%")).all()  
+    if(len(trains)<=1):  
+        return trains[0].train_no      
+    else:  
+        for train in trains:  
+            trainNo=train.train_no  
+            trainName=train.train_name  
+            trainDict={"optionInfo" : {"key" : f"{trainNo}"},  
+                       "description" : f"{trainNo}",  
+                       "title" : f"{trainName}"}  
+            trainList.append(trainDict)  
+        return trainList  
+
 
 if __name__ == '__main__':
-    print(live_status(19016, 'Palghar'))
+    '''print(live_status(19016, 'Palghar'))
     #PNR_status('8108432697')     #RAC 2612829606
     #trains_btwn_stations('BORIVALI','PALGHAR')
-    #live_station('Palghar')
+    #live_station('Palghar')'''
