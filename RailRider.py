@@ -14,7 +14,16 @@ def live_status(TrainNo, stnName):
     today=datetime.now()
     date=today.strftime("%d-%m-%Y")
     delay = 9999         # Default value of delay
-    delay = from_day(TrainNo,stnCode,date,1)
+    i=1
+    fromDay = from_day(stnName,TrainNo,i)
+    
+    response=requests.get(f"http://whereismytrain.in/cache/live_status?date={date}&from_day={fromDay}&train_no={TrainNo}")
+    data=response.json()
+    
+    for station in data.get('days_schedule'):
+        if(station.get('station_code') == stnCode):
+            delay=station.get('delay_in_arrival')
+    
     if delay is None or delay == 0:
         return "The train is on time!"
     elif delay != 9999:
@@ -126,19 +135,21 @@ def live_station(stnName, hrs=2):
     return message
 
 
-def from_day(TrainNo,stnCode,date,from_day_value):
-    formattedDate = int(date.split("-")[0])
-    response=requests.get(f"http://whereismytrain.in/cache/live_status?date={date}&from_day={from_day_value}&train_no={TrainNo}")
+def from_day(stnName,trainNo,from_day_value):
+    stnCode = stnName_to_stnCode(stnName)
+    today=datetime.now()
+    date=today.strftime("%d-%m-%Y")
+    formattedDate = today.strftime("%d %b %Y")
+    response=requests.get(f"http://whereismytrain.in/cache/live_status?date={date}&from_day={from_day_value}&train_no={trainNo}")
     data=response.json()
     for station in data.get('days_schedule'):
         if(station.get('station_code') == stnCode):
             arrival_date = station.get('actual_arrival_date')
-            arrival_date = int(arrival_date.split(" ")[0])
             if(arrival_date == formattedDate):
-                return station.get('delay_in_arrival')
+                return from_day_value
             else:
                 from_day_value+=1
-                return from_day(TrainNo, stnCode, date, from_day_value)
+                return from_day(stnName,trainNo,from_day_value)
 
 
 def trainName_to_trainCode(trainName):      
