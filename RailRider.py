@@ -14,14 +14,13 @@ def live_status(TrainNo, stnName):
     today=datetime.now()
     date=today.strftime("%d-%m-%Y")
     delay = 9999         # Default value of delay
-    i=1
-    fromDay = from_day(stnName,TrainNo,i)
-    response=requests.get(f"http://whereismytrain.in/cache/live_status?date={date}&from_day={fromDay}&train_no={TrainNo}")
-    #responese=requests.get(f"http://whereismytrain.in/cache/live_status?date=11-09-2018&from_day=2&train_no=19016")
-    data=response.json()
-    for station in data.get('days_schedule'):
-        if(station.get('station_code') == stnCode):
-            delay=station.get('delay_in_arrival')
+    #i=1
+    delay = from_day(TrainNo,stnCode,date,1)
+    #response=requests.get(f"http://whereismytrain.in/cache/live_status?date={date}&from_day={fromDay}&train_no={TrainNo}")
+    #data=response.json()
+    #for station in data.get('days_schedule'):
+    #    if(station.get('station_code') == stnCode):
+    #        delay=station.get('delay_in_arrival')
 
     if delay is None or delay == 0:
         return "The train is on time!"
@@ -132,35 +131,21 @@ def live_station(stnName, hrs=2):
             message.append(All_train_details)
     return message
 
-def day_in_short():
-    my_date = date.today()
-    day = calendar.day_name[my_date.weekday()]
-    '''
-    If the initials of day are not repeating then return first letter
-    e.g    Tuesday and Thursday starts with so we return Tu for Tuesday and Th for Thurday
-           and for Monday we return M 
-    '''
-    if(day =='Monday' or day == 'Wednesday' or day == 'Friday'):
-        day_code = day[0]
-    else:
-        day_code = day[0:2]
-    return day_code
 
-def from_day(stnName,trainNo,from_day_value):
-    stnCode = stnName_to_stnCode(stnName)
-    today=datetime.now()
-    date=today.strftime("%d-%m-%Y")
-    formattedDate = today.strftime("%d %b %Y")
-    response=requests.get(f"http://whereismytrain.in/cache/live_status?date={date}&from_day={from_day_value}&train_no={trainNo}")
+def from_day(TrainNo,stnCode,date,from_day_value):
+    formattedDate = int(date.split("-")[0])
+    response=requests.get(f"http://whereismytrain.in/cache/live_status?date={date}&from_day={from_day_value}&train_no={TrainNo}")
     data=response.json()
     for station in data.get('days_schedule'):
         if(station.get('station_code') == stnCode):
             arrival_date = station.get('actual_arrival_date')
+            arrival_date = int(arrival_date.split(" ")[0])
             if(arrival_date == formattedDate):
-                return from_day_value
+                return station.get('delay_in_arrival')
             else:
                 from_day_value+=1
-                return from_day(stnName,trainNo,from_day_value)
+                return from_day(TrainNo,stnCode,date,from_day_value)
+
 
 if __name__ == '__main__':
     print(live_status(19016, 'Palghar'))
