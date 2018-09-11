@@ -90,31 +90,37 @@ def trains_btwn_stations(stn1, stn2, viaStn="null", trainType="ALL"):
         Source_Stn = train["fromStn"]
         Destination_Stn = train["toStn"]
         AllTrainDetails = {"optionInfo": {"key": f"{TrainNumber}"},
+                            "description": f"{stn1} → {stn2}",
                             "title": f"{TrainName} ({TrainNumber})"}
         message.append(AllTrainDetails)
 
     if(len(trains) == 1):
         message = "\nName: "+ TrainName+"\nTrain number:"+TrainNumber+"\nDeparts from: "+Source_Stn+"\nwill arrive in"+Destination_Stn
-    return message
+        return message
+    else:
+        return message
 
 
 def live_station(stnName, hrs=2):
-    CurrentHour = int(datetime.now().strftime('%H')) #Converting to integer value
-    time_till = CurrentHour + hrs                       #Calculating the maximum search limit that is 4 hours
+    date = strftime("%d", gmtime())
+    CurrentTime = datetime.now().strftime('%H:%M')      #Taking the time when user call the function
+    TimeSplit = CurrentTime.split(":")                  #spliting the time to get hour
+    HourTime = int(TimeSplit[0])                        #Converting to integer value
+    time_till = HourTime + hrs                          #Calculating the maximum search limit that is 4 hours
     stnCode = stnName_to_stnCode(stnName)               
     response = requests.get(f"http://whereismytrain.in/cache/live_station?hrs={hrs}&station_code={stnCode}")
     data = response.json()
     message = []
-    
     for train in data.get('live_station_info', []):
         train_no = train.get('train_no')
         platform = train.get('platform')
-        DepartTime = train.get('actDep').split(',') # HH:MM
-        DepartHour = int(DepartTime[0].split(':')[0]) # HH
-        if DepartHour <= time_till and DepartHour >= CurrentHour: #Generating the list of trains within user specified time
-            delay = train.get('delay_in_arrival') # "Right time" or "XX:XX"
-            print(delay)
-            if delay == "RIGHT TIME" or delay is None:                   
+        DepartDateTime = train.get('actDep')
+        DepartTime = DepartDateTime.split(",")
+        DepartHourMin = DepartDateTime.split(":")
+        DepartHour = int(DepartHourMin[0])
+        if DepartHour <= time_till and DepartHour >= HourTime:      #Generating the list of trains within user specified time
+            delay = train.get('delay_in_arrival')                   # "Right time" or "XX:XX"
+            if delay == "RIGHT TIME":                   
                 delay = "On time"
             else:
                 hrs, mins = delay.split(':')
@@ -122,15 +128,14 @@ def live_station(stnName, hrs=2):
                     delay = f"{mins} mins late"
                 else:
                     delay = f"{hrs} hours and {mins} mins late"
-            DepartTimeFinal = time.strftime("%I:%M %p", time.strptime(DepartTime[0], "%H:%M"))
+            DepartTimeFinal = time.strftime( "%I:%M %p",time.strptime(DepartTime[0], "%H:%M"))
             name = train.get('train_name')
-            print("Name:")
             All_train_details = {"optionInfo": {"key": f"{train_no}"},
-                                "description": f"Will arrive on platform : {platform} at {DepartTimeFinal}",
+                                "description": f"Will arrive on platform : {platform} at {DepartTimeFinal}\n Delay : {delay}",
                                 "title": f"{name}"}
-            print("All_train_details: ", All_train_details)
             message.append(All_train_details)
     return message
+
 
 def day_in_short():
     my_date = date.today()
