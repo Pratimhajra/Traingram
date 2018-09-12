@@ -9,22 +9,30 @@ from database import session, StationInfo,TrainInfo
 from pure_python_parser import parse_json
 
 
-def live_status(TrainNo, stnName):
-    stnCode = stnName_to_stnCode(stnName)
+def live_status(TrainNo, stnName=None, actualStationCode=None):
+    if actualStationCode is not None:
+        stnCode = actualStationCode
+    else:
+        stnCode = stnName_to_stnCode(stnName)
     today=datetime.now()
     date=today.strftime("%d-%m-%Y")
     delay = 9999         # Default value of delay
     i=1
-    fromDay = from_day(stnName,TrainNo,i)
+    fromDay = from_day(stnCode,TrainNo,i)
+    if fromDay is None and stnName is not None:
+        return f"The given train doesn't run through {stnName}"
+    else:
+        pass
     
     response=requests.get(f"http://whereismytrain.in/cache/live_status?date={date}&from_day={fromDay}&train_no={TrainNo}")
     data=response.json()
+    #print(response.text)
     
     for station in data.get('days_schedule'):
         if(station.get('station_code') == stnCode):
-            delay=station.get('delay_in_arrival')
+            delay=station.get('delay_in_arrival', 9999) # delay is 999
     
-    if delay is None or delay == 0:
+    if delay == 0:
         return "The train is on time!"
     elif delay != 9999:
         message = f"The train is {delay} mins late"
@@ -135,12 +143,12 @@ def live_station(stnName, hrs=2):
     return message
 
 
-def from_day(stnName,trainNo,from_day_value):
-    stnCode = stnName_to_stnCode(stnName)
+def from_day(stnCode,trainNo,from_day_value):
     today=datetime.now()
     date=today.strftime("%d-%m-%Y")
     formattedDate = today.strftime("%d %b %Y")
     response=requests.get(f"http://whereismytrain.in/cache/live_status?date={date}&from_day={from_day_value}&train_no={trainNo}")
+    #print(response.text)
     data=response.json()
     for station in data.get('days_schedule'):
         if(station.get('station_code') == stnCode):
@@ -149,7 +157,7 @@ def from_day(stnName,trainNo,from_day_value):
                 return from_day_value
             else:
                 from_day_value+=1
-                return from_day(stnName,trainNo,from_day_value)
+                return from_day(stnCode,trainNo,from_day_value)
 
 
 def trainName_to_trainCode(trainName):      
@@ -169,7 +177,7 @@ def trainName_to_trainCode(trainName):
 
 
 if __name__ == '__main__':
-    print(live_status(19016, 'Palghar'))
+    print('xxxx')#print(live_status(19016, 'Palghar'))
     #PNR_status('8108432697')     #RAC 2612829606
     #trains_btwn_stations('BORIVALI','PALGHAR')
     #live_station('Palghar')
