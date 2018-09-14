@@ -19,8 +19,12 @@ def live_status(TrainNo, stnName=None, actualStationCode=None):
     delay = 9999         # Default value of delay
     i=1
     fromDay = from_day(stnCode,TrainNo,i)
-    if fromDay is None and stnName is not None:
+    if fromDay is None and stnName is not None: # If station provided by user is invalid
+        stnName = stnCode_to_stnName(stnCode)
         return f"The given train doesn't run through {stnName}"
+    elif fromDay is None and actualStationCode is not None: # If station selected from list is invalid
+        stnName = stnCode_to_stnName(stnCode)
+        return f"The given train doesn't halt at {stnName}"
     else:
         pass
     
@@ -76,7 +80,12 @@ def stnName_to_stnCode(stnName):
         return station_list # Return list of similar named stations
     return stations[0].station_code # Return the single station's station code
         
-
+def stnCode_to_stnName(stnCode):
+    """
+    Returns Station Name for input Station Code (Opposite of above function)
+    """
+    station = session.query(StationInfo).filter(StationInfo.station_code.like(f"%{stnCode}%")).first()
+    return station.title # Return title (Name) for the input station code
 
 def trains_btwn_stations(stn1, stn2, viaStn="null", trainType="ALL"):
     base_URL = "https://enquiry.indianrail.gov.in/ntes/"
@@ -108,10 +117,14 @@ def trains_btwn_stations(stn1, stn2, viaStn="null", trainType="ALL"):
     return message
 
 
-def live_station(stnName, hrs=2):
+def live_station(stnName=None, actualStationCode=None, hrs=2):
+    if actualStationCode is not None:
+        stnCode = actualStationCode
+    else:
+        stnCode = stnName_to_stnCode(stnName)
+
     CurrentHour = int(datetime.now().strftime('%H')) #Converting to integer value
-    time_till = CurrentHour + hrs                       #Calculating the maximum search limit that is 4 hours
-    stnCode = stnName_to_stnCode(stnName)               
+    time_till = CurrentHour + hrs                       #Calculating the maximum search limit that is 4 hours               
     response = requests.get(f"http://whereismytrain.in/cache/live_station?hrs={hrs}&station_code={stnCode}")
     data = response.json()
     message = []
