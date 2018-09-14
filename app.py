@@ -106,7 +106,7 @@ def _process_live_station(req):
     print(stations, "\n", stnName)
     title = f"Trains at {stnName}"
     textToSpeech = f"Here are trains at {stnName}"
-    live_station_output = live_station(stnName)
+    live_station_output = live_station(stnName=stnName)
     print(live_station_output)
     print(len(live_station_output))
     if(isinstance(stations, list)): # Check if response from stationName to Code is a list
@@ -144,7 +144,31 @@ def _process_options_live_status(req):
     return simple_response
     
 def _process_options_live_stations(req):
-    pass
+    outputContexts = req.get("queryResult").get("outputContexts")
+    stnCode = ""
+
+    for context in outputContexts:
+        # projects/${PROJECT_ID}/agent/sessions/${SESSION_ID}/contexts/actions_intent_option
+        name = context.get('name')
+
+        if name.endswith('actions_intent_option'):
+            stnCode = context.get('parameters').get('OPTION')
+
+    stnName = stnCode_to_stnName(stnCode)
+    title = f"Trains at {stnName}"
+    textToSpeech = f"Here are trains at {stnName}"
+
+    live_station_output = live_station(actualStationCode=stnCode)
+    if isinstance(live_station_output, list):
+        list_response['payload']['google']['systemIntent']['data']['listSelect']['title'] = title
+        list_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = textToSpeech
+        list_response['payload']['google']['systemIntent']['data']['listSelect']['items'] = live_station_output
+        return list_response
+    else:
+        simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = live_station_output
+        simple_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['displayText'] = live_station_output
+        return simple_response
+
 
 def _process_options_trains_btwn_stations(req):
     outputContexts = req.get("queryResult").get("outputContexts")
@@ -166,7 +190,8 @@ def _process_options_trains_btwn_stations(req):
 
     source_station_list = stnName_to_stnCode(source_station)
     destination_station_list = stnName_to_stnCode(destination_station)
-    if isinstance(source_station_list, list):
+    if isinstance(source_station_list, list): # station_code is sourceStation's STATION_CODE
+        #list_of_trains = trains_btwn_stations()
         list_response['payload']['google']['systemIntent']['data']['listSelect']['title'] = "Source Stations"
         list_response['payload']['google']['richResponse']['items'][0]['simpleResponse']['textToSpeech'] = "Please select source station"
         list_response['payload']['google']['systemIntent']['data']['listSelect']['items'] = source_station_list
