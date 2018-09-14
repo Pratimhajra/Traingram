@@ -136,7 +136,7 @@ def live_station(stnName=None, actualStationCode=None, hrs=2):
         DepartHour = int(DepartTime[0].split(':')[0]) # HH
         if DepartHour <= time_till and DepartHour >= CurrentHour: #Generating the list of trains within user specified time
             delay = train.get('delay_in_arrival') # "Right time" or "XX:XX"
-            print(delay)
+
             if delay == "RIGHT TIME" or delay is None:                   
                 delay = "On time"
             else:
@@ -147,11 +147,9 @@ def live_station(stnName=None, actualStationCode=None, hrs=2):
                     delay = f"{hrs} hours and {mins} mins late"
             DepartTimeFinal = time.strftime("%I:%M %p", time.strptime(DepartTime[0], "%H:%M"))
             name = train.get('train_name')
-            print("Name:")
             All_train_details = {"optionInfo": {"key": f"{train_no}"},
                                 "description": f"Arrives: {DepartTimeFinal}\nPlatform: {platform}",
                                 "title": f"{name}"}
-            print("All_train_details: ", All_train_details)
             message.append(All_train_details)
     return message
 
