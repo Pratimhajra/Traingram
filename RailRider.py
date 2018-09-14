@@ -149,7 +149,7 @@ def live_station(stnName=None, actualStationCode=None, hrs=2):
             name = train.get('train_name')
             print("Name:")
             All_train_details = {"optionInfo": {"key": f"{train_no}"},
-                                "description": f"Will arrive on platform : {platform} at {DepartTimeFinal}",
+                                "description": f"Arrives: {DepartTimeFinal}\nPlatform: {DepartTimeFinal}",
                                 "title": f"{name}"}
             print("All_train_details: ", All_train_details)
             message.append(All_train_details)
