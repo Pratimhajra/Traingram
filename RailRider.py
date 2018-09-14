@@ -84,7 +84,7 @@ def stnCode_to_stnName(stnCode):
     """
     Returns Station Name for input Station Code (Opposite of above function)
     """
-    station = session.query(StationInfo).filter(StationInfo.station_code.like(f"%{stnCode}%")).first()
+    station = session.query(StationInfo).filter(StationInfo.station_code == stnCode).first()
     return station.title # Return title (Name) for the input station code
 
 def trains_btwn_stations(stn1, stn2, viaStn="null", trainType="ALL"):
